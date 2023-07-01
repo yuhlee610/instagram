@@ -1,0 +1,24 @@
+.homePhones {
+  background-image: url('/home-phones-2x.png');
+  background-size: 457px 627px;
+  height: 580px;
+  width: 380px;
+  background-position: -38px 0;
+  display: none;
+  position: relative;
+
+  @media (min-width: 1024px) {
+    display: block;
+  }
+}
+
+.screenshot {
+  right: 17px;
+  bottom: 14px;
+  position: absolute;
+  opacity: 0;
+}
+
+.screenshotActive {
+  opacity: 1;
+}
