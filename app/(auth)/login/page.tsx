@@ -1,22 +1,23 @@
-'use client';
-
-import FacebookIcon from '@/components/FacebookIcon/FacebookIcon';
-import GoogleIcon from '@/components/GoogleIcon/GoogleIcon';
-import React from 'react'
+import React from 'react';
+import FacebookLoginButton from '@/components/FacebookLoginButton/FacebookLoginButton';
+import GoogleLoginButton from '@/components/GoogleLoginButton/GoogleLoginButton';
+import { authOptions } from '@/pages/api/auth/[...nextauth]';
+import { getServerSession } from 'next-auth';
+import { redirect } from 'next/navigation';
 
 const Login = () => {
+  const session = getServerSession(authOptions);
+
+  if (!!session) {
+    redirect('/');
+  }
+
   return (
     <div className="flex flex-col items-center space-y-4 mt-10">
-      <button className="py-2 px-3 bg-white text-sm font-semibold rounded-md shadow-md focus:outline-none w-52 text-left">
-        <GoogleIcon />
-        Sign in with Google
-      </button>
-      <button className="py-2 px-3 bg-white text-sm font-semibold rounded-md shadow-md focus:outline-none w-52 text-left">
-        <FacebookIcon />
-        Sign in with Facebook
-      </button>
+      <GoogleLoginButton />
+      <FacebookLoginButton />
     </div>
   );
-}
+};
 
-export default Login
+export default Login;
