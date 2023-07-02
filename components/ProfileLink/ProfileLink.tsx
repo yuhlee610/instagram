@@ -4,40 +4,35 @@ import clsx from 'clsx';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
-import { AiOutlineCompass, AiFillCompass } from 'react-icons/ai';
+import { RiAccountCircleLine, RiAccountCircleFill } from 'react-icons/ri';
 
-interface IExploreLink {
+interface IProfileLink {
   className?: string;
 }
 
-const EXPLORE_PATH = '/explore';
-
-const ExploreLink = (props: IExploreLink) => {
-  const pathname = usePathname();
-  const isActive = pathname === EXPLORE_PATH;
-
+const ProfileLink = (props: IProfileLink) => {
   return (
     <Link
-      href={EXPLORE_PATH}
+      href={'/profile'}
       className={clsx(
         'cursor-pointer flex p-3 md:hover:bg-stone-200 rounded-xl xl:w-full',
         props.className
       )}
     >
-      {isActive ? (
-        <AiFillCompass className="w-7 h-7" />
+      {true ? (
+        <RiAccountCircleFill className="w-7 h-7" />
       ) : (
-        <AiOutlineCompass className="w-7 h-7" />
+        <RiAccountCircleLine className="w-7 h-7" />
       )}
       <span
         className={clsx('hidden xl:inline-block ml-3', {
-          ['font-bold']: isActive,
+          ['font-bold']: true,
         })}
       >
-        Khám phá
+        Trang cá nhân
       </span>
     </Link>
   );
 };
 
-export default ExploreLink;
+export default ProfileLink;

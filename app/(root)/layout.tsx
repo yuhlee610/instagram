@@ -1,6 +1,7 @@
 import React from 'react';
 import Header from '../../components/Header/Header';
 import NavigationBar from '../../components/NavigationBar/NavigationBar';
+import Auth from '@/components/Auth/Auth';
 
 interface ILayout {
   children: React.ReactNode;
@@ -8,11 +9,11 @@ interface ILayout {
 
 const Layout = (props: ILayout) => {
   return (
-    <div>
+    <Auth>
       <Header />
-      <main className='mt-14 md:ml-20 md:mt-0 xl:ml-60'>{props.children}</main>
+      <main className="mt-14 md:ml-20 md:mt-0 xl:ml-60">{props.children}</main>
       <NavigationBar />
-    </div>
+    </Auth>
   );
 };
 

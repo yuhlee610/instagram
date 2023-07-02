@@ -21,6 +21,11 @@ export default defineType({
       type: 'image',
     }),
     defineField({
+      name: 'slug',
+      title: 'Slug',
+      type: 'string',
+    }),
+    defineField({
       name: 'emailVerified',
       type: 'datetime',
       hidden: true,

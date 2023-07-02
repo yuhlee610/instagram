@@ -4,6 +4,7 @@ import ExploreLink from '../ExploreLink/ExploreLink';
 import NewPostLink from '../NewPostLink/NewPostLink';
 import InboxLink from '../InboxLink/InboxLink';
 import Logo from '../Logo/Logo';
+import ProfileLink from '../ProfileLink/ProfileLink';
 
 const NavigationBar = () => {
   return (
@@ -17,6 +18,7 @@ const NavigationBar = () => {
       <ExploreLink />
       <NewPostLink />
       <InboxLink />
+      <ProfileLink />
     </nav>
   );
 };
