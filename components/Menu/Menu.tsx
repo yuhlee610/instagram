@@ -15,6 +15,11 @@ const Menu = (props: IMenu) => {
       )}
     >
       <FiMenu className="w-6 h-6" />
+      <span
+        className={'hidden xl:inline-block ml-3'}
+      >
+        Xem thêm
+      </span>
     </div>
   );
 };

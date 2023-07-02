@@ -1,8 +1,8 @@
 'use client';
 
+import useActiveLink from '@/hooks/useActiveLink';
 import clsx from 'clsx';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import React from 'react';
 import { BsChatDotsFill, BsChatDots } from 'react-icons/bs';
 
@@ -13,8 +13,7 @@ interface IInboxLink {
 const INBOX_PATH = '/inbox';
 
 const InboxLink = (props: IInboxLink) => {
-  const pathname = usePathname();
-  const isActive = pathname === INBOX_PATH;
+  const isActive = useActiveLink(INBOX_PATH);
 
   return (
     <Link

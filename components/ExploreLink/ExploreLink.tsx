@@ -1,8 +1,8 @@
 'use client';
 
+import useActiveLink from '@/hooks/useActiveLink';
 import clsx from 'clsx';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import React from 'react';
 import { AiOutlineCompass, AiFillCompass } from 'react-icons/ai';
 
@@ -13,8 +13,7 @@ interface IExploreLink {
 const EXPLORE_PATH = '/explore';
 
 const ExploreLink = (props: IExploreLink) => {
-  const pathname = usePathname();
-  const isActive = pathname === EXPLORE_PATH;
+  const isActive = useActiveLink(EXPLORE_PATH);
 
   return (
     <Link

@@ -2,7 +2,6 @@
 
 import clsx from 'clsx';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import React from 'react';
 import { RiAccountCircleLine, RiAccountCircleFill } from 'react-icons/ri';
 
@@ -19,14 +18,14 @@ const ProfileLink = (props: IProfileLink) => {
         props.className
       )}
     >
-      {true ? (
+      {false ? (
         <RiAccountCircleFill className="w-7 h-7" />
       ) : (
         <RiAccountCircleLine className="w-7 h-7" />
       )}
       <span
         className={clsx('hidden xl:inline-block ml-3', {
-          ['font-bold']: true,
+          ['font-bold']: false,
         })}
       >
         Trang cá nhân

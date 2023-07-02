@@ -20,12 +20,12 @@ const Popover = (props: IPopover) => {
     onCloseCallback = () => {},
     menuClasses,
     content,
+    className,
   } = props;
   const [isDisplay, setIsDisplay] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const showTip = () => {
-    console.log('hi')
     setIsDisplay(true);
     onOpenCallback();
   };
@@ -33,6 +33,10 @@ const Popover = (props: IPopover) => {
   const hideTip = () => {
     setIsDisplay(false);
     onCloseCallback();
+  };
+
+  const handleClickChildCpn = () => {
+    isDisplay ? hideTip() : showTip();
   };
 
   useEffect(() => {
@@ -57,11 +61,11 @@ const Popover = (props: IPopover) => {
           onMouseLeave: hideTip,
         }
       : {
-          onClick: showTip,
+          onClick: handleClickChildCpn,
         };
   return (
-    <div {...wrapperEvent} ref={containerRef} className="relative">
-      {children}
+    <div ref={containerRef} className={`relative ${className}`}>
+      <div {...wrapperEvent}>{children}</div>
       {isDisplay && (
         <div
           className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none ${menuClasses}`}

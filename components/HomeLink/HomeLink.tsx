@@ -2,9 +2,9 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
 import { GoHome, GoHomeFill } from 'react-icons/go';
+import useActiveLink from '@/hooks/useActiveLink';
 
 const HOME_PATH = '/';
 
@@ -13,8 +13,7 @@ interface IHomeLink {
 }
 
 const HomeLink = (props: IHomeLink) => {
-  const pathname = usePathname();
-  const isActive = pathname === HOME_PATH;
+  const isActive = useActiveLink(HOME_PATH);
 
   return (
     <Link
