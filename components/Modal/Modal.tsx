@@ -62,7 +62,7 @@ const Modal: React.FC<Props> = (props) => {
 
   const closeButton = (
     <button
-      className="absolute top-0 right-1 z-50 p-2 bg-transparent"
+      className="absolute top-3 right-3 z-50 p-2 bg-transparent"
       onClick={handleClose}
     >
       <span>{closeMessage}</span>

@@ -1,4 +1,9 @@
 .wrapper {
   width: 348px;
   height: 391px;
+
+  @media (min-width: 768px) {
+    width: 535px;
+    height: 578px;
+  }
 }

@@ -1,9 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useRef, DragEvent } from 'react';
 import Modal from '../Modal/Modal';
 
 import css from './NewPostModal.module.css';
+import { useForm } from 'react-hook-form';
+import Image from 'next/image';
+import SwiperCarousel from '../SwiperCarousel/SwiperCarousel';
 
 const MediaIcon = () => {
   return (
@@ -28,23 +31,91 @@ const MediaIcon = () => {
       />
     </svg>
   );
+};
+
+interface IInputImages {
+  images: FileList;
 }
 
 const NewPostModal = () => {
+  const { register, watch, setValue } = useForm<IInputImages>();
+  const { ref, ...inputProps } = register('images');
+  const inputImagesRef = useRef<HTMLElement | null>(null);
+
+  const watchImages = watch('images');
+  const uploadedImage = !!watchImages;
+  console.log(watchImages)
+
+  const handleClickAddImagesButton = () => {
+    inputImagesRef.current!.click();
+  };
+
+  const onDragEnter = (e: DragEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
+  };
+
+  const onDragOver = (e: DragEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
+  };
+
+  const onDrop = (e: DragEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const dt = e.dataTransfer;
+    if (!!dt) {
+      setValue('images', dt.files);
+    }
+  };
+
+  const inputImagesArea = (
+    <div
+      className="flex flex-col items-center justify-center space-y-3 w-full h-full"
+      onDragEnter={onDragEnter}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+    >
+      <MediaIcon />
+      <div className="text-lg">Kéo ảnh vào đây</div>
+      <button
+        className="bg-sky-500 rounded-md px-3 py-2 text-sm font-semibold text-white"
+        onClick={handleClickAddImagesButton}
+      >
+        Chọn từ máy tính
+      </button>
+      <input
+        type="file"
+        ref={(e) => {
+          ref(e);
+          inputImagesRef.current = e;
+        }}
+        {...inputProps}
+        hidden
+        multiple
+      />
+    </div>
+  );
+
+  console.log(Array.from(watchImages || []))
+  const previewImages = <SwiperCarousel>
+    {Array.from(watchImages || []).map((file) => {
+      console.log(btoa())
+      return 1
+    })}
+  </SwiperCarousel>
+
   return (
     <Modal isOpen={true} onClose={() => {}} className="" id="123">
       <div className="h-full flex items-center justify-center">
-        <div className={`rounded-md bg-white flex flex-col ${css.wrapper}`}>
+        <div className={`rounded-xl bg-white flex flex-col ${css.wrapper}`}>
           <div className="text-center py-3 text-sm font-semibold">
             Tạo bài viết mới
           </div>
           <hr />
-          <div className='flex flex-col justify-center items-center flex-grow space-y-3'>
-            <MediaIcon />
-            <div className='text-lg'>Kéo ảnh vào đây</div>
-            <button className="bg-sky-500 rounded-md px-3 py-2 text-sm font-semibold text-white">
-              Chọn từ máy tính
-            </button>
+          <div className="flex flex-col justify-center items-center flex-grow">
+            {inputImagesArea}
+            {/* {uploadedImage ? inputImagesArea : } */}
           </div>
         </div>
       </div>

@@ -1,0 +1,148 @@
+:root {
+  --swiper-theme-color: var(--marketplaceColor);
+  --swiper-navigation-size: 20px;
+}
+
+:global(.swiper-container) {
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  overflow: hidden;
+  list-style: none;
+  padding: 0;
+  /* Fix of Webkit flickering */
+  z-index: 1;
+}
+
+:global(.swiper-container-vertical>.swiper-wrapper) {
+  flex-direction: column;
+}
+
+:global(.swiper-wrapper) {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  display: flex;
+  transition-property: transform;
+  box-sizing: content-box;
+}
+
+:global(.swiper-container-android .swiper-slide),
+:global(.swiper-wrapper) {
+  transform: translate3d(0px, 0, 0);
+}
+
+:global(.swiper-container-multirow>.swiper-wrapper) {
+  flex-wrap: wrap;
+}
+
+:global(.swiper-container-multirow-column>.swiper-wrapper) {
+  flex-wrap: wrap;
+  flex-direction: column;
+}
+
+:global(.swiper-container-free-mode>.swiper-wrapper) {
+  transition-timing-function: ease-out;
+  margin: 0 auto;
+}
+
+:global(.swiper-container-pointer-events) {
+  touch-action: pan-y;
+}
+
+:global(.swiper-container-pointer-events) {
+  touch-action: pan-x;
+}
+
+:global(.swiper-slide) {
+  flex-shrink: 0;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transition-property: transform;
+}
+
+:global(.swiper-slide-invisible-blank) {
+  visibility: hidden;
+}
+
+/* Auto Height */
+:global(.swiper-container-autoheight),
+:global(.swiper-container-autoheight .swiper-slide) {
+  height: auto;
+}
+
+:global(.swiper-container-autoheight .swiper-wrapper) {
+  align-items: flex-start;
+  transition-property: transform, height;
+}
+
+/* 3D Effects */
+:global(.swiper-container-3d) {
+  perspective: 1200px;
+}
+
+:global(.swiper-container-3d .swiper-wrapper),
+:global(.swiper-container-3d .swiper-slide),
+:global(.swiper-container-3d .swiper-slide-shadow-left),
+:global(.swiper-container-3d .swiper-slide-shadow-right),
+:global(.swiper-container-3d .swiper-slide-shadow-top),
+:global(.swiper-container-3d .swiper-slide-shadow-bottom),
+:global(.swiper-container-3d .swiper-cube-shadow) {
+  transform-style: preserve-3d;
+}
+
+:global(.swiper-container-3d .swiper-slide-shadow-left),
+:global(.swiper-container-3d .swiper-slide-shadow-right),
+:global(.swiper-container-3d .swiper-slide-shadow-top),
+:global(.swiper-container-3d .swiper-slide-shadow-bottom) {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+:global(.swiper-container-3d .swiper-slide-shadow-left) {
+  background-image: linear-gradient(to left, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
+}
+
+:global(.swiper-container-3d .swiper-slide-shadow-right) {
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
+}
+
+:global(.swiper-container-3d .swiper-slide-shadow-top) {
+  background-image: linear-gradient(to top, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
+}
+
+:global(.swiper-container-3d .swiper-slide-shadow-bottom) {
+  background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
+}
+
+/* CSS Mode */
+:global(.swiper-container-css-mode>.swiper-wrapper) {
+  overflow: auto;
+  scrollbar-width: none;
+  /* For Firefox */
+  -ms-overflow-style: none;
+  /* For Internet Explorer and Edge */
+}
+
+:global(.swiper-container-css-mode>.swiper-wrapper::-webkit-scrollbar) {
+  display: none;
+}
+
+:global(.swiper-container-css-mode>.swiper-wrapper>.swiper-slide) {
+  scroll-snap-align: start start;
+}
+
+:global(.swiper-container-horizontal.swiper-container-css-mode>.swiper-wrapper) {
+  scroll-snap-type: x mandatory;
+}
+
+:global(.swiper-container-vertical.swiper-container-css-mode>.swiper-wrapper) {
+  scroll-snap-type: y mandatory;
+}

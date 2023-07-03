@@ -1,6 +1,6 @@
 import { client } from '@/lib/sanity';
+import { SanityAdapter } from '@/adapter';
 import NextAuth, { NextAuthOptions, SessionStrategy } from 'next-auth';
-import { SanityAdapter } from 'next-auth-sanity';
 import GoogleProvider from 'next-auth/providers/google';
 
 export const authOptions: NextAuthOptions = {
