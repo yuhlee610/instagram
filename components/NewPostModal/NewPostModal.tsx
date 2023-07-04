@@ -1,12 +1,15 @@
 'use client';
 
-import React, { useRef, DragEvent } from 'react';
+import React, { useRef, DragEvent, MouseEvent, useState } from 'react';
 import Modal from '../Modal/Modal';
+import { useForm } from 'react-hook-form';
+import SwiperCarousel from '../SwiperCarousel/SwiperCarousel';
+import usePreviewImages from '@/hooks/usePreviewImages';
+import { SwiperSlide } from 'swiper/react';
+import Image from 'next/image';
+import { BsArrowLeft } from 'react-icons/bs';
 
 import css from './NewPostModal.module.css';
-import { useForm } from 'react-hook-form';
-import Image from 'next/image';
-import SwiperCarousel from '../SwiperCarousel/SwiperCarousel';
 
 const MediaIcon = () => {
   return (
@@ -38,15 +41,17 @@ interface IInputImages {
 }
 
 const NewPostModal = () => {
-  const { register, watch, setValue } = useForm<IInputImages>();
+  const { register, watch, setValue, reset } = useForm<IInputImages>();
   const { ref, ...inputProps } = register('images');
   const inputImagesRef = useRef<HTMLElement | null>(null);
-
+  const [isFinalStage, setIsFinalStage] = useState<boolean>(false);
   const watchImages = watch('images');
-  const uploadedImage = !!watchImages;
-  console.log(watchImages)
+  const previewImages = usePreviewImages(watchImages);
 
-  const handleClickAddImagesButton = () => {
+  const uploadedImage = !!watchImages;
+
+  const handleClickAddImagesButton = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     inputImagesRef.current!.click();
   };
 
@@ -69,9 +74,16 @@ const NewPostModal = () => {
     }
   };
 
+  const onBack = () => {
+    setIsFinalStage(false);
+    if (!isFinalStage) {
+      reset();
+    }
+  };
+
   const inputImagesArea = (
     <div
-      className="flex flex-col items-center justify-center space-y-3 w-full h-full"
+      className="flex flex-col items-center justify-center space-y-3 "
       onDragEnter={onDragEnter}
       onDragOver={onDragOver}
       onDrop={onDrop}
@@ -97,25 +109,57 @@ const NewPostModal = () => {
     </div>
   );
 
-  console.log(Array.from(watchImages || []))
-  const previewImages = <SwiperCarousel>
-    {Array.from(watchImages || []).map((file) => {
-      console.log(btoa())
-      return 1
-    })}
-  </SwiperCarousel>
+  const previewImagesCarousel = (
+    <SwiperCarousel className="w-full h-full">
+      {previewImages?.map((url, index) => (
+        <SwiperSlide key={index}>
+          <Image
+            className="object-contain"
+            src={url}
+            alt="preview image"
+            fill
+          />
+        </SwiperSlide>
+      ))}
+    </SwiperCarousel>
+  );
+
+  const actions = isFinalStage ? (
+    <div className="text-sm text-sky-500 font-semibold cursor-pointer">
+      Chia sẻ
+    </div>
+  ) : uploadedImage ? (
+    <div
+      className="text-sm text-sky-500 font-semibold cursor-pointer"
+      onClick={() => setIsFinalStage(true)}
+    >
+      Tiếp
+    </div>
+  ) : null;
 
   return (
     <Modal isOpen={true} onClose={() => {}} className="" id="123">
       <div className="h-full flex items-center justify-center">
-        <div className={`rounded-xl bg-white flex flex-col ${css.wrapper}`}>
-          <div className="text-center py-3 text-sm font-semibold">
-            Tạo bài viết mới
+        <div
+          className={`rounded-xl bg-white flex flex-col overflow-hidden ${css.wrapper}`}
+        >
+          <div className="flex justify-between items-center px-3 relative h-11">
+            {uploadedImage && (
+              <BsArrowLeft
+                className="scale-125 cursor-pointer"
+                onClick={onBack}
+              />
+            )}
+            <div className="absolute text-sm font-semibold left-1/2 translate-x-[-50%]">
+              {uploadedImage ? 'Xem lại' : 'Tạo bài viết mới'}
+            </div>
+            {actions}
           </div>
           <hr />
           <div className="flex flex-col justify-center items-center flex-grow">
-            {inputImagesArea}
-            {/* {uploadedImage ? inputImagesArea : } */}
+            <form className="w-full h-full flex items-center justify-center">
+              {uploadedImage ? previewImagesCarousel : inputImagesArea}
+            </form>
           </div>
         </div>
       </div>
