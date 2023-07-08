@@ -1,15 +1,42 @@
 'use client';
 
-import React, { useRef, DragEvent, MouseEvent, useState } from 'react';
+import React, {
+  useRef,
+  DragEvent,
+  MouseEvent,
+  useState,
+  ChangeEvent,
+} from 'react';
 import Modal from '../Modal/Modal';
-import { useForm } from 'react-hook-form';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import SwiperCarousel from '../SwiperCarousel/SwiperCarousel';
 import usePreviewImages from '@/hooks/usePreviewImages';
 import { SwiperSlide } from 'swiper/react';
 import Image from 'next/image';
 import { BsArrowLeft } from 'react-icons/bs';
+import AutoSizingTextarea from '../AutoSizingTextarea/AutoSizingTextarea';
+import { SmallAvatar } from '../Avatar/Avatar';
+import { useSession } from 'next-auth/react';
+import { IUser } from '@/types/common';
+import EmojiPicker from '../EmojiPicker/EmojiPicker';
+import { GoCheckCircle } from 'react-icons/go';
+import { IoIosCloseCircleOutline } from 'react-icons/io';
 
-import css from './NewPostModal.module.css';
+const UPLOAD_IMAGES_STAGE = 'UPLOAD_IMAGES_STAGE';
+const PREVIEW_IMAGES_STAGE = 'PREVIEW_IMAGES_STAGE';
+const ADD_CAPTION_STAGE = 'ADD_CAPTION_STAGE';
+const LOADING_SUBMIT_STAGE = 'LOADING_SUBMIT_STAGE';
+const SUCCESS_SUBMIT_STAGE = 'SUCCESS_SUBMIT_STAGE';
+const ERROR_SUBMIT_STAGE = 'ERROR_SUBMIT_STAGE';
+const STAGES = [UPLOAD_IMAGES_STAGE, PREVIEW_IMAGES_STAGE, ADD_CAPTION_STAGE];
+
+const getPrevStage = (currStage: string) => {
+  const currStageIndex = STAGES.findIndex((stage) => stage === currStage);
+  return STAGES[currStageIndex - 1];
+};
+
+const isEqualToStage = (currStage: string, desStage: string) =>
+  currStage === desStage;
 
 const MediaIcon = () => {
   return (
@@ -36,19 +63,21 @@ const MediaIcon = () => {
   );
 };
 
-interface IInputImages {
+interface IPostInput {
   images: FileList;
+  caption: string;
 }
 
 const NewPostModal = () => {
-  const { register, watch, setValue, reset } = useForm<IInputImages>();
-  const { ref, ...inputProps } = register('images');
+  const { data: session } = useSession();
+  const { register, watch, setValue, reset, getValues, handleSubmit } =
+    useForm<IPostInput>();
+  const { ref, onChange, ...inputProps } = register('images');
   const inputImagesRef = useRef<HTMLElement | null>(null);
-  const [isFinalStage, setIsFinalStage] = useState<boolean>(false);
+  const [stage, setStage] = useState<string>(UPLOAD_IMAGES_STAGE);
   const watchImages = watch('images');
   const previewImages = usePreviewImages(watchImages);
-
-  const uploadedImage = !!watchImages;
+  const currentUser = session?.user as IUser;
 
   const handleClickAddImagesButton = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -69,21 +98,57 @@ const NewPostModal = () => {
     e.stopPropagation();
     e.preventDefault();
     const dt = e.dataTransfer;
-    if (!!dt) {
+    if (dt) {
       setValue('images', dt.files);
     }
   };
 
   const onBack = () => {
-    setIsFinalStage(false);
-    if (!isFinalStage) {
+    const prevStage = getPrevStage(stage);
+    setStage(prevStage);
+    if (isEqualToStage(stage, UPLOAD_IMAGES_STAGE)) {
       reset();
+    }
+  };
+
+  const onImagesChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setStage(PREVIEW_IMAGES_STAGE);
+    onChange(e);
+  };
+
+  const onEmojiSelect = (emoji: any) => {
+    const symbol = emoji.unified.split('-');
+    const codesArray = symbol.map((el: string) => '0x' + el);
+    const formattedEmoji = String.fromCodePoint(...codesArray);
+    const captionValue = getValues('caption');
+    setValue('caption', `${captionValue}${formattedEmoji}`, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  };
+
+  const onSubmit: SubmitHandler<IPostInput> = async (data) => {
+    setStage(LOADING_SUBMIT_STAGE);
+
+    try {
+      const formData = new FormData();
+      const images = [...data.images];
+      images.forEach((image) => formData.append(image.name, image));
+      formData.append('caption', data.caption);
+
+      await fetch('/api/post', {
+        method: 'POST',
+        body: formData,
+      });
+      setStage(SUCCESS_SUBMIT_STAGE);
+    } catch (error) {
+      setStage(ERROR_SUBMIT_STAGE);
     }
   };
 
   const inputImagesArea = (
     <div
-      className="flex flex-col items-center justify-center space-y-3 "
+      className="flex flex-col items-center justify-center space-y-3 w-full h-full"
       onDragEnter={onDragEnter}
       onDragOver={onDragOver}
       onDrop={onDrop}
@@ -91,18 +156,20 @@ const NewPostModal = () => {
       <MediaIcon />
       <div className="text-lg">Kéo ảnh vào đây</div>
       <button
-        className="bg-sky-500 rounded-md px-3 py-2 text-sm font-semibold text-white"
+        className="bg-sky-500 hover:bg-sky-600 rounded-md px-3 py-2 text-sm font-semibold text-white"
         onClick={handleClickAddImagesButton}
       >
         Chọn từ máy tính
       </button>
       <input
+        {...inputProps}
         type="file"
         ref={(e) => {
           ref(e);
           inputImagesRef.current = e;
         }}
-        {...inputProps}
+        onChange={onImagesChange}
+        accept="image/*"
         hidden
         multiple
       />
@@ -110,7 +177,7 @@ const NewPostModal = () => {
   );
 
   const previewImagesCarousel = (
-    <SwiperCarousel className="w-full h-full">
+    <SwiperCarousel className="w-full h-full rounded-b-xl overflow-hidden">
       {previewImages?.map((url, index) => (
         <SwiperSlide key={index}>
           <Image
@@ -124,41 +191,137 @@ const NewPostModal = () => {
     </SwiperCarousel>
   );
 
-  const actions = isFinalStage ? (
-    <div className="text-sm text-sky-500 font-semibold cursor-pointer">
-      Chia sẻ
+  const inputCaptionArea = (
+    <div className="p-4 h-full flex flex-col space-y-3">
+      <div className="flex space-x-3 items-center">
+        <SmallAvatar image={currentUser?.avatar} />
+        <div className="text-sm font-semibold">{currentUser?.name}</div>
+      </div>
+      <div className="flex-grow overflow-y-auto h-px">
+        <AutoSizingTextarea
+          {...register('caption')}
+          placeholder="Viết chú thích"
+        />
+      </div>
+      <EmojiPicker onEmojiSelect={onEmojiSelect} />
     </div>
-  ) : uploadedImage ? (
-    <div
-      className="text-sm text-sky-500 font-semibold cursor-pointer"
-      onClick={() => setIsFinalStage(true)}
-    >
-      Tiếp
-    </div>
-  ) : null;
+  );
+
+  const getLayoutsMatchStage = () => {
+    switch (stage) {
+      case UPLOAD_IMAGES_STAGE:
+        return {
+          previousStep: null,
+          nextStep: null,
+          content: inputImagesArea,
+          heading: 'Tạo bài viết mới',
+        };
+
+      case PREVIEW_IMAGES_STAGE:
+        return {
+          previousStep: (
+            <BsArrowLeft
+              className="scale-125 cursor-pointer"
+              onClick={onBack}
+            />
+          ),
+          nextStep: (
+            <div
+              className="text-sm text-sky-500 font-semibold cursor-pointer"
+              onClick={() => setStage(ADD_CAPTION_STAGE)}
+            >
+              Tiếp
+            </div>
+          ),
+          content: previewImagesCarousel,
+          heading: 'Tạo bài viết mới',
+        };
+
+      case ADD_CAPTION_STAGE:
+        return {
+          previousStep: (
+            <BsArrowLeft
+              className="scale-125 cursor-pointer"
+              onClick={onBack}
+            />
+          ),
+          nextStep: (
+            <div
+              className="text-sm text-sky-500 font-semibold cursor-pointer"
+              onClick={handleSubmit(onSubmit)}
+            >
+              Chia sẻ
+            </div>
+          ),
+          content: inputCaptionArea,
+          heading: 'Tạo bài viết mới',
+        };
+
+      case LOADING_SUBMIT_STAGE:
+        return {
+          heading: 'Đang chia sẻ bài viết',
+          content: (
+            <div className="flex items-center justify-center h-full">
+              <div
+                className="inline-block h-28 w-28 animate-spin rounded-full border-8 border-solid border-current border-r-transparent align-[-0.125em] text-primary motion-reduce:animate-[spin_1.5s_linear_infinite]"
+                role="status"
+              >
+                <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+                  Loading...
+                </span>
+              </div>
+            </div>
+          ),
+        };
+
+      case SUCCESS_SUBMIT_STAGE:
+        return {
+          heading: 'Đã chia sẻ bài viết',
+          content: (
+            <div className="flex flex-col items-center justify-center h-full gap-4">
+              <GoCheckCircle className="w-24 h-24" />
+              <div>Đã chia sẻ bài viết của bạn</div>
+            </div>
+          ),
+        };
+
+      case ERROR_SUBMIT_STAGE:
+        return {
+          heading: 'Chia sẻ thất bại',
+          content: (
+            <div className="flex flex-col items-center justify-center h-full gap-4">
+              <IoIosCloseCircleOutline className="w-24 h-24" />
+              <div>Chia sẻ bài viết thất bại</div>
+            </div>
+          ),
+        };
+
+      default:
+        return {
+          previousStep: null,
+          nextStep: null,
+          content: null,
+        };
+    }
+  };
+
+  const { previousStep, nextStep, content, heading } = getLayoutsMatchStage();
 
   return (
     <Modal isOpen={true} onClose={() => {}} className="" id="123">
       <div className="h-full flex items-center justify-center">
-        <div
-          className={`rounded-xl bg-white flex flex-col overflow-hidden ${css.wrapper}`}
-        >
+        <div className="rounded-xl bg-white flex flex-col w-[346px] h-[391px] md:w-[533px] md:h-[578px]">
           <div className="flex justify-between items-center px-3 relative h-11">
-            {uploadedImage && (
-              <BsArrowLeft
-                className="scale-125 cursor-pointer"
-                onClick={onBack}
-              />
-            )}
+            {previousStep}
             <div className="absolute text-sm font-semibold left-1/2 translate-x-[-50%]">
-              {uploadedImage ? 'Xem lại' : 'Tạo bài viết mới'}
+              {heading}
             </div>
-            {actions}
+            {nextStep}
           </div>
           <hr />
           <div className="flex flex-col justify-center items-center flex-grow">
-            <form className="w-full h-full flex items-center justify-center">
-              {uploadedImage ? previewImagesCarousel : inputImagesArea}
+            <form className="w-full h-full" encType="multipart/form-data">
+              {content}
             </form>
           </div>
         </div>

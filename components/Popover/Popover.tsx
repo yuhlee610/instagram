@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import useClickOutSide from '@/hooks/useClickOutside';
+import React, { useEffect, useState } from 'react';
 
 interface IPopover {
   children: React.ReactNode;
@@ -23,14 +24,14 @@ const Popover = (props: IPopover) => {
     className,
   } = props;
   const [isDisplay, setIsDisplay] = useState<boolean>(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useClickOutSide<HTMLDivElement>(hideTip);
 
   const showTip = () => {
     setIsDisplay(true);
     onOpenCallback();
   };
 
-  const hideTip = () => {
+  function hideTip() {
     setIsDisplay(false);
     onCloseCallback();
   };

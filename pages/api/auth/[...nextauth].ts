@@ -1,7 +1,8 @@
-import { client } from '@/lib/sanity';
+import { client } from '@/services/sanity';
 import { SanityAdapter } from '@/adapter';
 import NextAuth, { NextAuthOptions, SessionStrategy } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
+import sanitySdk from '@/services';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -17,6 +18,15 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.SECRET_KEY,
   pages: {
     signIn: '/login',
+  },
+  callbacks: {
+    async session({ session, user, token }) {
+      if (session?.user?.email) {
+        const dbUser = await sanitySdk.getUserByEmail(session?.user?.email);
+        session.user = dbUser
+      }
+      return session;
+    },
   },
 };
 

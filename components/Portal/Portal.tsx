@@ -16,7 +16,7 @@ const Portal: React.FC<PortalProps> = (props) => {
       const modalContainer = window.document.createElement('div');
       if (portalRoot && modalContainer) {
         modalContainer.className =
-          'overflow-hidden w-screen h-screen fixed z-50';
+          'fixed z-50';
         portalRoot.appendChild(modalContainer);
         return modalContainer;
       }
