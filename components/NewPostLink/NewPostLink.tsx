@@ -18,7 +18,7 @@ const NewPostLink = (props: INewPostLink) => {
     <Link
       href="?new-post=true"
       className={clsx(
-        'cursor-pointer flex p-3 md:hover:bg-stone-200 rounded-xl xl:w-full',
+        'cursor-pointer flex p-3 md:hover:bg-stone-200 rounded-xl xl:w-full xl:mb-2',
         props.className
       )}
     >

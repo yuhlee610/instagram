@@ -10,7 +10,8 @@ export default async function (email: string) {
         slug,
         emailVerified,
         createdAt,
-        modifiedAt
+        modifiedAt,
+        'liked': *[_type == "like" && author._ref == ^._id]
     }`,
     {
       email,

@@ -9,7 +9,7 @@ const Header = () => {
     
   </div>
   return (
-    <div className="fixed top-0 border-b border-gray-200 flex items-center justify-between h-14 w-full bg-white px-4 md:hidden">
+    <div className="fixed z-10 top-0 border-b border-gray-200 flex items-center justify-between h-14 w-full bg-white px-4 md:hidden">
       <Logo iconClassName="hidden" />
       <Popover
         content={<LogoutButton />}
