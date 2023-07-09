@@ -21,6 +21,7 @@ import { IUser } from '@/types/common';
 import EmojiPicker from '../EmojiPicker/EmojiPicker';
 import { GoCheckCircle } from 'react-icons/go';
 import { IoIosCloseCircleOutline } from 'react-icons/io';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const UPLOAD_IMAGES_STAGE = 'UPLOAD_IMAGES_STAGE';
 const PREVIEW_IMAGES_STAGE = 'PREVIEW_IMAGES_STAGE';
@@ -70,6 +71,9 @@ interface IPostInput {
 
 const NewPostModal = () => {
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const isOpenNewPostModal = !!searchParams?.get('new-post');
   const { register, watch, setValue, reset, getValues, handleSubmit } =
     useForm<IPostInput>();
   const { ref, onChange, ...inputProps } = register('images');
@@ -308,7 +312,14 @@ const NewPostModal = () => {
   const { previousStep, nextStep, content, heading } = getLayoutsMatchStage();
 
   return (
-    <Modal isOpen={true} onClose={() => {}} className="" id="123">
+    <Modal
+      isOpen={isOpenNewPostModal}
+      onClose={() => {
+        router.back();
+      }}
+      className=""
+      id="123"
+    >
       <div className="h-full flex items-center justify-center">
         <div className="rounded-xl bg-white flex flex-col w-[346px] h-[391px] md:w-[533px] md:h-[578px]">
           <div className="flex justify-between items-center px-3 relative h-11">
