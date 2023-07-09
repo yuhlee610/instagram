@@ -1,4 +1,4 @@
-import { client } from "./sanity";
+import { client } from "../sanity";
 
 export default async function (email: string) {
   return await client.fetch(

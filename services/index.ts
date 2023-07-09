@@ -1,8 +1,8 @@
-import getUserByEmail from './getUserByEmail';
-import urlFor from './urlFor';
-import uploadImages from './uploadImages';
-import createPost from './createPost';
-import getLatestPosts from './getLatestPosts';
+import getUserByEmail from './user/getUserByEmail';
+import urlFor from './image/urlFor';
+import uploadImages from './image/uploadImages';
+import createPost from './post/createPost';
+import getLatestPosts from './post/getLatestPosts';
 
 const sanitySdk = {
   getUserByEmail,

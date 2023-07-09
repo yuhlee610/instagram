@@ -1,4 +1,4 @@
-import { client } from './sanity';
+import { client } from '../sanity';
 
 interface IGetPostsQueryParams {
   page?: number;

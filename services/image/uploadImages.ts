@@ -1,4 +1,4 @@
-import { client } from './sanity';
+import { client } from '../sanity';
 
 const uploadImages = (files: Blob[]) => {
   const uploadRequests = files.map((file) => {

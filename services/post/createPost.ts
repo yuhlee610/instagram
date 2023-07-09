@@ -1,5 +1,5 @@
 import { IUser } from '@/types/common';
-import { client } from './sanity';
+import { client } from '../sanity';
 
 const createPost = (imageAsset: any, caption: string, user: IUser) => {
   return client.create({

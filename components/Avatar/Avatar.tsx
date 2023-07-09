@@ -1,4 +1,4 @@
-import urlFor from '@/services/urlFor';
+import urlFor from '@/services/image/urlFor';
 import Image from 'next/image';
 import React from 'react';
 import { Image as IImage } from 'sanity';
