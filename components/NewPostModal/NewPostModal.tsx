@@ -150,6 +150,11 @@ const NewPostModal = () => {
     }
   };
 
+  const onCloseModal = () => {
+    router.back();
+    setStage(UPLOAD_IMAGES_STAGE);
+  }
+
   const inputImagesArea = (
     <div
       className="flex flex-col items-center justify-center space-y-3 w-full h-full"
@@ -314,9 +319,7 @@ const NewPostModal = () => {
   return (
     <Modal
       isOpen={isOpenNewPostModal}
-      onClose={() => {
-        router.back();
-      }}
+      onClose={onCloseModal}
       className=""
       id="123"
     >

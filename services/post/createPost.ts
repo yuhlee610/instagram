@@ -1,7 +1,6 @@
-import { IUser } from '@/types/common';
 import { client } from '../sanity';
 
-const createPost = (imageAsset: any, caption: string, user: IUser) => {
+const createPost = (imageAsset: any, caption: string, userId: string) => {
   return client.create({
     _type: 'post',
     caption,
@@ -15,7 +14,7 @@ const createPost = (imageAsset: any, caption: string, user: IUser) => {
     })),
     author: {
       _type: 'reference',
-      _ref: user._id,
+      _ref: userId,
     },
     createdAt: new Date(),
   });

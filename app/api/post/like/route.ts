@@ -1,8 +1,3 @@
-import sanitySdk from '@/services';
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/pages/api/auth/[...nextauth]';
-import { IUser } from '@/types/common';
 import {
   SERVER_ERROR_CODE,
   SERVER_ERROR_MESSAGE,
@@ -11,8 +6,11 @@ import {
   UNAUTHORIZED_CODE,
   UNAUTHORIZED_MESSAGE,
 } from '@/lib/errors';
-
-const CAPTION_KEY = 'caption';
+import { authOptions } from '@/pages/api/auth/[...nextauth]';
+import sanitySdk from '@/services';
+import { IUser } from '@/types/common';
+import { getServerSession } from 'next-auth';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,18 +23,9 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    const body = await request.json();
     const currentUser = session.user as IUser;
-    const formData = await request.formData();
-    const images: File[] = [];
-    const caption = formData.get(CAPTION_KEY) as string;
-    for (const [key, value] of formData.entries()) {
-      if (key !== CAPTION_KEY) {
-        images.push(value as File);
-      }
-    }
-    const imageAssets = await sanitySdk.uploadImages(images);
-
-    await sanitySdk.createPost(imageAssets, caption, currentUser._id);
+    await sanitySdk.likePost(currentUser._id, body.postId);
 
     return NextResponse.json({
       status: SUCCESS_CODE,
