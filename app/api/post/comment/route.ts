@@ -25,11 +25,12 @@ export async function POST(request: NextRequest) {
 
     const { postId, comment } = await request.json();
     const currentUser = session.user as IUser;
-    await sanitySdk.createComment({ userId: currentUser._id, postId, comment });
+    const createdComment = await sanitySdk.createComment({ userId: currentUser._id, postId, comment });
 
     return NextResponse.json({
       status: SUCCESS_CODE,
       message: SUCCESS_CODE_MESSAGE,
+      data: createdComment
     });
   } catch (error) {
     return NextResponse.json({

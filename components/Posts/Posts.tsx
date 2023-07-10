@@ -14,7 +14,7 @@ const INITIAL_PAGE = 1;
 const Posts = (props: IPosts) => {
   const {
     initialPosts,
-    user: { liked },
+    user,
   } = props;
   const [posts, setPosts] = useState<[IPost]>(initialPosts);
   const [page, setPage] = useState<number>(INITIAL_PAGE);
@@ -22,10 +22,17 @@ const Posts = (props: IPosts) => {
   return (
     <div className="flex flex-col space-y-3">
       {posts.map((post) => {
-        const isPostLiked = !!liked.find(
+        const isPostLiked = !!user.liked.find(
           (likedPost) => likedPost.post._ref === post._id
         );
-        return <Post key={post._id} isPostLiked={isPostLiked} {...post} />;
+        return (
+          <Post
+            key={post._id}
+            currentUser={user}
+            isPostLiked={isPostLiked}
+            {...post}
+          />
+        );
       })}
     </div>
   );

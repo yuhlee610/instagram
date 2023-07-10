@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, MouseEventHandler } from 'react';
-import { IClassName, IPost } from '@/types/common';
+import { IClassName, IComment, IPost, IUser } from '@/types/common';
 import { MediumAvatar } from '../Avatar/Avatar';
 import { formatCreatedAt } from '@/lib/dates';
 import SwiperCarousel from '../SwiperCarousel/SwiperCarousel';
@@ -17,6 +17,7 @@ import Comment from '../Comment/Comment';
 
 interface IPostComponentWrapper extends IPost, IClassName {
   isPostLiked: boolean;
+  currentUser: IUser;
 }
 
 interface IPostComponent extends IPostComponentWrapper {
@@ -48,11 +49,14 @@ const PostComponent = (props: IPostComponent) => {
     className = '',
     showCommentInput = false,
     showComments = false,
-    comments,
+    comments: initialComments,
+    currentUser,
   } = props;
   const [isLiked, setIsLiked] = useState<boolean>(isPostLiked);
   const [likeTotal, setLikeTotal] = useState<number>(likes);
   const { register, handleSubmit, watch } = useForm<ICommentForm>();
+  const [comments, setComments] = useState<IComment[]>(initialComments);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const isSubmitButtonActive = !!watch('comment');
 
   const onLike = async () => {
@@ -75,12 +79,23 @@ const PostComponent = (props: IPostComponent) => {
 
   const onSubmit: SubmitHandler<ICommentForm> = async (data) => {
     try {
-      await fetch('/api/post/comment', {
+      setIsSubmitting(true);
+      const response = await fetch('/api/post/comment', {
         method: 'POST',
         body: JSON.stringify({ ...data, postId: _id }),
       });
+      const createdComment = await response.json();
+      setComments([
+        {
+          ...createdComment.data,
+          author: currentUser,
+        },
+        ...comments,
+      ]);
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -108,7 +123,7 @@ const PostComponent = (props: IPostComponent) => {
         ))}
       </SwiperCarousel>
       {showComments && (
-        <div className="col-span-2 row-start-2 row-end-3 p-4">
+        <div className="hidden md:block col-span-2 row-start-2 row-end-3 p-4 max-h-[410px] overflow-auto">
           {comments.map((comment) => (
             <Comment key={comment._id} {...comment} />
           ))}
@@ -152,10 +167,12 @@ const PostComponent = (props: IPostComponent) => {
             </div>
             <button
               className={`text-sm font-semibold ${
-                isSubmitButtonActive ? 'text-sky-500' : 'text-sky-200'
+                isSubmitButtonActive && !isSubmitting
+                  ? 'text-sky-500'
+                  : 'text-sky-200'
               }`}
               onClick={handleSubmit(onSubmit)}
-              disabled={!isSubmitButtonActive}
+              disabled={!isSubmitButtonActive || isSubmitting}
             >
               Đăng
             </button>

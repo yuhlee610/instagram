@@ -23,7 +23,7 @@ const getQuery = (queryParams: IGetPostsQueryParams) => {
       images,
       createdAt,
       'likes': count(*[_type == "like" && post._ref == ^._id]),
-      'comments': *[_type == "comment" && post._ref == ^._id] {
+      'comments': *[_type == "comment" && post._ref == ^._id] | order(createdAt desc) {
         _id,
         content,
         createdAt,
@@ -48,7 +48,7 @@ const getQuery = (queryParams: IGetPostsQueryParams) => {
     images,
     createdAt,
     'likes': count(*[_type == "like" && post._ref == ^._id]),
-    'comments': *[_type == "comment" && post._ref == ^._id] {
+    'comments': *[_type == "comment" && post._ref == ^._id] | order(createdAt desc) {
       _id,
       content,
       createdAt,
