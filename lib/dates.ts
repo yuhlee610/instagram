@@ -10,7 +10,7 @@ const options: Intl.DateTimeFormatOptions = {
   day: 'numeric',
 };
 
-export const formatPostCreatedAt = (createdAt: Date) => {
+export const formatCreatedAt = (createdAt: Date) => {
   const createdAtDiff = moment().diff(createdAt, 'seconds');
 
   if (createdAtDiff < SECONDS_PER_MINUTE) {

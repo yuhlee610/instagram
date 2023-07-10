@@ -13,8 +13,8 @@ interface IAvatarComponent extends IAvatar {
 }
 
 const classWithSize = {
-  small: 'w-[28px] h-[28px]',
-  medium: 'w-[38px] h-[38px]',
+  small: 'w-[28px] h-[28px] min-w-[28px]',
+  medium: 'w-[38px] h-[38px] min-w-[38px]',
 };
 
 const AvatarComponent = (props: IAvatarComponent) => {

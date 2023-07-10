@@ -12,6 +12,16 @@ export interface IReference {
 export interface IPostRef extends IPost, IReference {
 }
 
+export interface IComment {
+  _id: string;
+  author: IUser;
+  post: IPostRef;
+  content: string;
+  createdAt: Date;
+  createdAt: Date;
+  modifiedAt: Date;
+}
+
 export interface ILike {
   _id: string;
   author: IUser;
@@ -43,4 +53,5 @@ export interface IPost {
   createdAt: Date;
   modifiedAt: Date;
   likes: number;
+  comments: IComment[];
 }

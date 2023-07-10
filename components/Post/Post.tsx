@@ -3,7 +3,7 @@
 import React, { useState, MouseEventHandler } from 'react';
 import { IClassName, IPost } from '@/types/common';
 import { MediumAvatar } from '../Avatar/Avatar';
-import { formatPostCreatedAt } from '@/lib/dates';
+import { formatCreatedAt } from '@/lib/dates';
 import SwiperCarousel from '../SwiperCarousel/SwiperCarousel';
 import { SwiperSlide } from 'swiper/react';
 import Image from 'next/image';
@@ -13,6 +13,7 @@ import { TbMessageCircle2 } from 'react-icons/tb';
 import Modal from '../Modal/Modal';
 import AutoSizingTextarea from '../AutoSizingTextarea/AutoSizingTextarea';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import Comment from '../Comment/Comment';
 
 interface IPostComponentWrapper extends IPost, IClassName {
   isPostLiked: boolean;
@@ -24,6 +25,7 @@ interface IPostComponent extends IPostComponentWrapper {
   headingClassName?: string;
   actionsClassName?: string;
   showCommentInput?: boolean;
+  showComments?: boolean;
 }
 
 interface ICommentForm {
@@ -45,10 +47,13 @@ const PostComponent = (props: IPostComponent) => {
     actionsClassName = '',
     className = '',
     showCommentInput = false,
+    showComments = false,
+    comments,
   } = props;
   const [isLiked, setIsLiked] = useState<boolean>(isPostLiked);
   const [likeTotal, setLikeTotal] = useState<number>(likes);
-  const { register, handleSubmit } = useForm<ICommentForm>();
+  const { register, handleSubmit, watch } = useForm<ICommentForm>();
+  const isSubmitButtonActive = !!watch('comment');
 
   const onLike = async () => {
     await fetch('/api/post/like', {
@@ -87,7 +92,7 @@ const PostComponent = (props: IPostComponent) => {
         <MediumAvatar image={author.avatar} />
         <div className="font-semibold text-sm">{author.name}</div>
         <div className="text-sm text-slate-400">
-          {formatPostCreatedAt(createdAt)}
+          {formatCreatedAt(createdAt)}
         </div>
       </div>
       <SwiperCarousel className={`bg-slate-50 ${swiperClassName}`}>
@@ -102,6 +107,13 @@ const PostComponent = (props: IPostComponent) => {
           </SwiperSlide>
         ))}
       </SwiperCarousel>
+      {showComments && (
+        <div className="col-span-2 row-start-2 row-end-3 p-4">
+          {comments.map((comment) => (
+            <Comment key={comment._id} {...comment} />
+          ))}
+        </div>
+      )}
       <div className={`${actionsClassName}`}>
         <div className="flex px-3">
           {isLiked ? (
@@ -133,14 +145,17 @@ const PostComponent = (props: IPostComponent) => {
           <div className="flex h-9 px-4">
             <div className="overflow-y-auto flex-grow gap-2">
               <AutoSizingTextarea
-                {...register('comment')}
+                {...register('comment', { required: true })}
                 placeholder="Thêm bình luận"
                 className="bg-slate-50 text-sm"
               />
             </div>
             <button
-              className="text-sky-500 text-sm font-semibold"
+              className={`text-sm font-semibold ${
+                isSubmitButtonActive ? 'text-sky-500' : 'text-sky-200'
+              }`}
               onClick={handleSubmit(onSubmit)}
+              disabled={!isSubmitButtonActive}
             >
               Đăng
             </button>
@@ -155,7 +170,7 @@ const PostWrapper = (props: IPostComponentWrapper) => {
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
 
   return (
-    <div className="w-[470px] pb-5 border-b-[1px] border-b-slate-200">
+    <div className="w-[470px] pb-5 md:border-b-[1px] border-b-slate-200">
       <PostComponent
         {...props}
         onClickComment={() => setIsOpenModal(true)}
@@ -176,6 +191,7 @@ const PostWrapper = (props: IPostComponentWrapper) => {
               swiperClassName="h-[490px] md:h-full md:col-span-1 md:row-start-1 md:row-end-4"
               actionsClassName="md:col-span-2 md:row-start-3 md:border-t-[1px] md:border-t-slate-200"
               showCommentInput
+              showComments
               {...props}
             />
           </div>
