@@ -190,7 +190,7 @@ const NewPostModal = () => {
       {previewImages?.map((url, index) => (
         <SwiperSlide key={index}>
           <Image
-            className="object-contain"
+            className="object-cover"
             src={url}
             alt="preview image"
             fill
@@ -320,8 +320,7 @@ const NewPostModal = () => {
     <Modal
       isOpen={isOpenNewPostModal}
       onClose={onCloseModal}
-      className=""
-      id="123"
+      id="create-post"
     >
       <div className="h-full flex items-center justify-center">
         <div className="rounded-xl bg-white flex flex-col w-[346px] h-[391px] md:w-[533px] md:h-[578px]">

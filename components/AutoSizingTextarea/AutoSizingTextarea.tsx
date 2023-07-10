@@ -1,9 +1,10 @@
 'use client';
 
+import { IClassName } from '@/types/common';
 import React, { ChangeEvent, useRef } from 'react';
 import { ChangeHandler } from 'react-hook-form';
 
-interface IAutoSizingTextarea {
+interface IAutoSizingTextarea extends IClassName {
   placeholder?: string;
   onChange: ChangeHandler;
   onBlur: ChangeHandler;
@@ -13,7 +14,7 @@ interface IAutoSizingTextarea {
 
 const AutoSizingTextarea = React.forwardRef<HTMLTextAreaElement, IAutoSizingTextarea>(
   (props, ref) => {
-    const { onChange, maxHeight = Infinity, ...rest } = props;
+    const { onChange, maxHeight = Infinity, className, ...rest } = props;
 
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -30,7 +31,7 @@ const AutoSizingTextarea = React.forwardRef<HTMLTextAreaElement, IAutoSizingText
 
     return (
       <textarea
-        className="resize-none h-auto w-full outline-none border-none"
+        className={`${className} resize-none h-auto w-full outline-none border-none`}
         ref={(e) => {
           if (ref && typeof ref === 'function') {
             ref(e);

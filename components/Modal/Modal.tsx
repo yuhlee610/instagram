@@ -16,7 +16,7 @@ type Props = {
   scrollingDisabled?: boolean;
   id: string;
   children: React.ReactNode;
-  className: string;
+  className?: string;
 };
 
 const Modal: React.FC<Props> = (props) => {

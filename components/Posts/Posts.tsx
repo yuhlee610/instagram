@@ -18,7 +18,6 @@ const Posts = (props: IPosts) => {
   } = props;
   const [posts, setPosts] = useState<[IPost]>(initialPosts);
   const [page, setPage] = useState<number>(INITIAL_PAGE);
-  console.log(liked);
 
   return (
     <div className="flex flex-col space-y-3">
