@@ -1,7 +1,7 @@
 'use client';
 
 import { IClassName, IPost, IUser } from '@/types/common';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Post from '../Post/Post';
 
 interface IPosts extends IClassName {
@@ -18,6 +18,7 @@ const Posts = (props: IPosts) => {
   } = props;
   const [posts, setPosts] = useState<[IPost]>(initialPosts);
   const [page, setPage] = useState<number>(INITIAL_PAGE);
+  console.log(posts)
 
   return (
     <div className="flex flex-col space-y-3">

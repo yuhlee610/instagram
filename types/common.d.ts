@@ -55,3 +55,8 @@ export interface IPost {
   likes: number;
   comments: IComment[];
 }
+
+export interface IAction {
+  type: string;
+  payload: any;
+}

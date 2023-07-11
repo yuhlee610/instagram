@@ -145,14 +145,15 @@ const NewPostModal = () => {
         body: formData,
       });
       setStage(SUCCESS_SUBMIT_STAGE);
+      router.refresh();
     } catch (error) {
       setStage(ERROR_SUBMIT_STAGE);
     }
   };
 
   const onCloseModal = () => {
-    router.back();
     setStage(UPLOAD_IMAGES_STAGE);
+    router.back();
   }
 
   const inputImagesArea = (
