@@ -49,3 +49,38 @@ export async function POST(request: NextRequest) {
     });
   }
 }
+
+export async function GET(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return NextResponse.json({
+        status: UNAUTHORIZED_CODE,
+        message: UNAUTHORIZED_MESSAGE,
+      });
+    }
+
+    const perPage = request.nextUrl.searchParams.get('perPage') || 10;
+    const lastId = request.nextUrl.searchParams.get('lastId') || '';
+    const lastCreatedAt =
+      request.nextUrl.searchParams.get('lastCreatedAt') || new Date().toJSON();
+
+    const posts = await sanitySdk.getLatestPosts({
+      perPage: +perPage,
+      lastId,
+      lastCreatedAt,
+    });
+
+    return NextResponse.json({
+      status: SUCCESS_CODE,
+      message: SUCCESS_CODE_MESSAGE,
+      data: posts,
+    });
+  } catch (error) {
+    return NextResponse.json({
+      status: SERVER_ERROR_CODE,
+      message: SERVER_ERROR_MESSAGE,
+    });
+  }
+}

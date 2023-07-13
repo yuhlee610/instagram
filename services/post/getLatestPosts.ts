@@ -1,16 +1,15 @@
 import { client } from '../sanity';
 
 interface IGetPostsQueryParams {
-  page?: number;
   perPage?: number;
   lastId?: string;
-  lastCreatedAt?: Date;
+  lastCreatedAt?: string;
 }
 
 const getQuery = (queryParams: IGetPostsQueryParams) => {
-  const { page = 1, perPage = 10, lastId, lastCreatedAt } = queryParams;
-  const start = (page - 1) * perPage;
-  const end = page * perPage;
+  const { perPage = 1, lastId, lastCreatedAt } = queryParams;
+  const start = 0;
+  const end = perPage;
   if (!lastId || !lastCreatedAt) {
     return {
       query: `*[_type == "post"] | order(createdAt desc) [$start...$end]{
@@ -38,7 +37,7 @@ const getQuery = (queryParams: IGetPostsQueryParams) => {
   }
 
   return {
-    query: `*[_type == "post"] && ( createdAt > $lastCreatedAt || (createdAt == $lastCreatedAt && _id > $lastId))] | order(createdAt desc) [$start...$end]{
+    query: `*[_type == "post" && ( createdAt < $lastCreatedAt || (createdAt == $lastCreatedAt && _id > $lastId))] | order(createdAt desc) [$start...$end]{
     _id,
     caption,
     author -> {

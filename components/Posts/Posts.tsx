@@ -1,27 +1,53 @@
 'use client';
 
 import { IClassName, IPost, IUser } from '@/types/common';
-import React, { useEffect, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import Post from '../Post/Post';
+import useInfiniteScroll from '@/hooks/useInfiniteScroll';
+import { PiSpinnerGap } from 'react-icons/pi';
 
 interface IPosts extends IClassName {
-  initialPosts: [IPost];
+  initialPosts: IPost[];
   user: IUser;
 }
 
-const INITIAL_PAGE = 1;
+const PER_PAGE = 1;
 
 const Posts = (props: IPosts) => {
-  const {
-    initialPosts,
-    user,
-  } = props;
-  const [posts, setPosts] = useState<[IPost]>(initialPosts);
-  const [page, setPage] = useState<number>(INITIAL_PAGE);
-  console.log(posts)
+  const { initialPosts, user } = props;
+  const [posts, setPosts] = useState<IPost[]>(initialPosts);
+  const lastPostRef = useRef<IPost | undefined>(
+    initialPosts[initialPosts.length - 1]
+  );
+  const [loading, setLoading] = useState(false);
+
+  const observerHandler = () => {
+    const lastPost = lastPostRef.current;
+
+    if (!lastPost) return;
+
+    const { _id, createdAt } = lastPost;
+
+    setLoading(true);
+
+    fetch(
+      `/api/post?lastId=${_id}&lastCreatedAt=${createdAt}&perPage=${PER_PAGE}`
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        lastPostRef.current = data.data.findLast((post: IPost) => post);
+        setPosts((prevPosts) => [...prevPosts, ...data.data]);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setLoading(false);
+        console.error(error);
+      });
+  };
+  const observerTarget = useInfiniteScroll<HTMLDivElement>(observerHandler);
 
   return (
-    <div className="flex flex-col space-y-3">
+    <div className="flex flex-col space-y-4 mb-10 mt-6">
       {posts.map((post) => {
         const isPostLiked = !!user.liked.find(
           (likedPost) => likedPost.post._ref === post._id
@@ -35,6 +61,10 @@ const Posts = (props: IPosts) => {
           />
         );
       })}
+      <div ref={observerTarget} />
+      {loading && (
+        <PiSpinnerGap className="animate-spin w-6 h-6 mx-auto mt-4" />
+      )}
     </div>
   );
 };

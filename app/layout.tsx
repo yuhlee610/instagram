@@ -1,7 +1,7 @@
 import { ILayout } from '@/types/common';
 import './globals.css'
 import { Inter } from 'next/font/google'
-import SessionProvider from '@/context/SessionProvider/SessionProvider';
+import SessionProvider from '@/components/SessionProvider/SessionProvider';
 
 const inter = Inter({ subsets: ['latin'] })
 

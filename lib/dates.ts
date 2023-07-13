@@ -10,7 +10,7 @@ const options: Intl.DateTimeFormatOptions = {
   day: 'numeric',
 };
 
-export const formatCreatedAt = (createdAt: Date) => {
+export const formatCreatedAt = (createdAt: string) => {
   const createdAtDiff = moment().diff(createdAt, 'seconds');
 
   if (createdAtDiff < SECONDS_PER_MINUTE) {
@@ -23,5 +23,5 @@ export const formatCreatedAt = (createdAt: Date) => {
     return `${Math.ceil(createdAtDiff / SECONDS_PER_MONTH)} ngày`;
   }
 
-  return createdAt.toLocaleDateString('vi-VN', options);
+  return new Date(createdAt).toLocaleDateString('vi-VN', options);
 };

@@ -17,16 +17,16 @@ export interface IComment {
   author: IUser;
   post: IPostRef;
   content: string;
-  createdAt: Date;
-  createdAt: Date;
-  modifiedAt: Date;
+  createdAt: string;
+  createdAt: string;
+  modifiedAt: string;
 }
 
 export interface ILike {
   _id: string;
   author: IUser;
   post: IPostRef;
-  createdAt: Date;
+  createdAt: string;
 }
 
 export interface IUser {
@@ -35,9 +35,9 @@ export interface IUser {
   email: string;
   avatar: Image;
   slug: string;
-  emailVerified: Date;
-  createdAt: Date;
-  modifiedAt: Date;
+  emailVerified: string;
+  createdAt: string;
+  modifiedAt: string;
   liked: ILike[];
 }
 
@@ -50,8 +50,8 @@ export interface IPost {
   author: IUser;
   caption: string;
   images: Image[];
-  createdAt: Date;
-  modifiedAt: Date;
+  createdAt: string;
+  modifiedAt: string;
   likes: number;
   comments: IComment[];
 }
