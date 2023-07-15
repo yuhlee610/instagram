@@ -2,9 +2,9 @@
 
 import { IClassName, IPost, IUser } from '@/types/common';
 import React, { useRef, useState } from 'react';
-import Post from '../Post/Post';
 import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 import { PiSpinnerGap } from 'react-icons/pi';
+import NewFeedPost from '../NewFeedPost/NewFeedPost';
 
 interface IPosts extends IClassName {
   initialPosts: IPost[];
@@ -47,13 +47,13 @@ const Posts = (props: IPosts) => {
   const observerTarget = useInfiniteScroll<HTMLDivElement>(observerHandler);
 
   return (
-    <div className="flex flex-col space-y-4 mb-10 mt-6">
+    <div className="flex flex-col space-y-4 mb-4 mt-6 w-full justify-center items-center">
       {posts.map((post) => {
         const isPostLiked = !!user.liked.find(
           (likedPost) => likedPost.post._ref === post._id
         );
         return (
-          <Post
+          <NewFeedPost
             key={post._id}
             currentUser={user}
             isPostLiked={isPostLiked}

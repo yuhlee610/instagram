@@ -10,23 +10,19 @@ import Image from 'next/image';
 import sanitySdk from '@/services';
 import { AiOutlineHeart, AiTwotoneHeart } from 'react-icons/ai';
 import { TbMessageCircle2 } from 'react-icons/tb';
-import Modal from '../Modal/Modal';
 import AutoSizingTextarea from '../AutoSizingTextarea/AutoSizingTextarea';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import Comment from '../Comment/Comment';
 
-interface IPostComponentWrapper extends IPost, IClassName {
-  isPostLiked: boolean;
-  currentUser: IUser;
-}
-
-interface IPostComponent extends IPostComponentWrapper {
-  onClickComment: MouseEventHandler<SVGElement>;
+interface IPostComponent extends IPost, IClassName {
+  onOpenModal: MouseEventHandler<SVGElement>;
   swiperClassName?: string;
   headingClassName?: string;
   actionsClassName?: string;
   showCommentInput?: boolean;
   showComments?: boolean;
+  isPostLiked: boolean;
+  currentUser: IUser;
 }
 
 interface ICommentForm {
@@ -42,7 +38,7 @@ const PostComponent = (props: IPostComponent) => {
     createdAt,
     likes,
     isPostLiked,
-    onClickComment,
+    onOpenModal,
     swiperClassName = '',
     headingClassName = '',
     actionsClassName = '',
@@ -144,7 +140,7 @@ const PostComponent = (props: IPostComponent) => {
           )}
           <TbMessageCircle2
             className="p-2 h-10 w-10 scale-110 cursor-pointer"
-            onClick={onClickComment}
+            onClick={onOpenModal}
           />
         </div>
         <div className="font-semibold text-sm px-4 mb-2">
@@ -183,39 +179,4 @@ const PostComponent = (props: IPostComponent) => {
   );
 };
 
-const PostWrapper = (props: IPostComponentWrapper) => {
-  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
-
-  return (
-    <div className="w-[470px] pb-5 md:border-b-[1px] border-b-slate-200">
-      <PostComponent
-        {...props}
-        onClickComment={() => setIsOpenModal(true)}
-        className="grid-cols-1"
-        swiperClassName="h-[585px]"
-      />
-      <Modal
-        isOpen={isOpenModal}
-        onClose={() => setIsOpenModal(false)}
-        id={`post-detail-${props._id}`}
-      >
-        <div className="h-full flex items-center justify-center">
-          <div className="w-[470px] md:w-[80%] md:max-w-[916px] md:h-[80%] xl:h-[741px] bg-slate-50 rounded-md">
-            <PostComponent
-              onClickComment={() => setIsOpenModal(true)}
-              className="grid-cols-1 md:grid-cols-2 md:grid-rows-[70px_1fr_150px] h-full"
-              headingClassName="md:col-start-2 md:col-end-3 md:pl-4 md:border-b-[1px] md:border-b-slate-200"
-              swiperClassName="h-[490px] md:h-full md:col-span-1 md:row-start-1 md:row-end-4"
-              actionsClassName="md:col-span-2 md:row-start-3 md:border-t-[1px] md:border-t-slate-200"
-              showCommentInput
-              showComments
-              {...props}
-            />
-          </div>
-        </div>
-      </Modal>
-    </div>
-  );
-};
-
-export default PostWrapper;
+export default PostComponent;

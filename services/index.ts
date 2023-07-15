@@ -6,6 +6,8 @@ import getLatestPosts from './post/getLatestPosts';
 import likePost from './post/likePost';
 import unlikePost from './post/unlikePost';
 import createComment from './comment/create';
+import getSlugs from './user/getSlugs';
+import getUserBySlug from './user/getUserBySlug';
 
 const sanitySdk = {
   getUserByEmail,
@@ -16,6 +18,8 @@ const sanitySdk = {
   likePost,
   unlikePost,
   createComment,
+  getSlugs,
+  getUserBySlug,
 };
 
 export default sanitySdk;

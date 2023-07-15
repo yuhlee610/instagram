@@ -38,7 +38,9 @@ export interface IUser {
   emailVerified: string;
   createdAt: string;
   modifiedAt: string;
+  bio: string;
   liked: ILike[];
+  posts: IPost[];
 }
 
 export interface IClassName {

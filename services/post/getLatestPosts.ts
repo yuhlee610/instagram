@@ -30,7 +30,7 @@ const getQuery = (queryParams: IGetPostsQueryParams) => {
           name,
           avatar,
         }
-    }
+      }
     }`,
       params: { start, end },
     };
