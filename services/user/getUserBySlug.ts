@@ -33,6 +33,8 @@ export default async function (slug: string) {
                 }
             }
         },
+        'followers': *[_type == "follow" && following._ref == ^._id],
+        'following': *[_type == "follow" && follower._ref == ^._id]
     }`,
     {
       slug,

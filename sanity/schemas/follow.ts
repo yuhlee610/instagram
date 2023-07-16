@@ -6,18 +6,16 @@ export default defineType({
   type: 'document',
   fields: [
     defineField({
-      name: 'follower',
-      title: 'Follower',
+      name: 'user',
+      title: 'User',
       type: 'reference',
       to: { type: 'user' },
-      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'following',
       title: 'Following',
       type: 'reference',
       to: { type: 'user' },
-      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'createdAt',

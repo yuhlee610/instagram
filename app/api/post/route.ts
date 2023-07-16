@@ -19,10 +19,12 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session) {
-      return NextResponse.json({
-        status: UNAUTHORIZED_CODE,
-        message: UNAUTHORIZED_MESSAGE,
-      });
+      return NextResponse.json(
+        {
+          message: UNAUTHORIZED_MESSAGE,
+        },
+        { status: UNAUTHORIZED_CODE }
+      );
     }
 
     const currentUser = session.user as IUser;
@@ -38,15 +40,19 @@ export async function POST(request: NextRequest) {
 
     await sanitySdk.createPost(imageAssets, caption, currentUser._id);
 
-    return NextResponse.json({
-      status: SUCCESS_CODE,
-      message: SUCCESS_CODE_MESSAGE,
-    });
+    return NextResponse.json(
+      {
+        message: SUCCESS_CODE_MESSAGE,
+      },
+      { status: SUCCESS_CODE }
+    );
   } catch (error) {
-    return NextResponse.json({
-      status: SERVER_ERROR_CODE,
-      message: SERVER_ERROR_MESSAGE,
-    });
+    return NextResponse.json(
+      {
+        message: SERVER_ERROR_MESSAGE,
+      },
+      { status: SERVER_ERROR_CODE }
+    );
   }
 }
 
@@ -55,10 +61,12 @@ export async function GET(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session) {
-      return NextResponse.json({
-        status: UNAUTHORIZED_CODE,
-        message: UNAUTHORIZED_MESSAGE,
-      });
+      return NextResponse.json(
+        {
+          message: UNAUTHORIZED_MESSAGE,
+        },
+        { status: UNAUTHORIZED_CODE }
+      );
     }
 
     const perPage = request.nextUrl.searchParams.get('perPage') || 10;
@@ -72,15 +80,19 @@ export async function GET(request: NextRequest) {
       lastCreatedAt,
     });
 
-    return NextResponse.json({
-      status: SUCCESS_CODE,
-      message: SUCCESS_CODE_MESSAGE,
-      data: posts,
-    });
+    return NextResponse.json(
+      {
+        message: SUCCESS_CODE_MESSAGE,
+        data: posts,
+      },
+      { status: SUCCESS_CODE }
+    );
   } catch (error) {
-    return NextResponse.json({
-      status: SERVER_ERROR_CODE,
-      message: SERVER_ERROR_MESSAGE,
-    });
+    return NextResponse.json(
+      {
+        message: SERVER_ERROR_MESSAGE,
+      },
+      { status: SERVER_ERROR_CODE }
+    );
   }
 }

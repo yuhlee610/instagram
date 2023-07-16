@@ -19,7 +19,7 @@ const NewFeed = (props: IPosts) => {
   const lastPostRef = useRef<IPost | undefined>(
     initialPosts[initialPosts.length - 1]
   );
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const observerHandler = () => {
     const lastPost = lastPostRef.current;

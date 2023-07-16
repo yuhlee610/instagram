@@ -12,6 +12,13 @@ export interface IReference {
 export interface IPostRef extends IPost, IReference {
 }
 
+export interface IFollow {
+  _id: string;
+  createdAt: Date;
+  user: IReference;
+  following: IReference;
+}
+
 export interface IComment {
   _id: string;
   author: IUser;
@@ -41,6 +48,8 @@ export interface IUser {
   bio: string;
   liked: ILike[];
   posts: IPost[];
+  following: IFollow[];
+  followers: IFollow[];
 }
 
 export interface IClassName {

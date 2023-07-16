@@ -66,14 +66,12 @@ const PostComponent = (props: IPostComponent) => {
   };
 
   const onUnlike = async () => {
-    await fetch('/api/post/unlike', {
+    await fetch(`/api/post/unlike?postId=${_id}`, {
       method: 'DELETE',
-      body: JSON.stringify({ postId: _id }),
     });
     setIsLiked((prev) => !prev);
     setLikeTotal((prevLikeTotal) => prevLikeTotal - 1);
   };
-
 
   const onSubmit: SubmitHandler<ICommentForm> = async (data) => {
     try {

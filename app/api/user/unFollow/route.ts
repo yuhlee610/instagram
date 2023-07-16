@@ -12,7 +12,7 @@ import { IUser } from '@/types/common';
 import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(request: NextRequest) {
+export async function DELETE(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -21,27 +21,33 @@ export async function POST(request: NextRequest) {
         {
           message: UNAUTHORIZED_MESSAGE,
         },
-        { status: UNAUTHORIZED_CODE }
+        {
+          status: UNAUTHORIZED_CODE,
+        }
       );
     }
-
-    const { postId, comment } = await request.json();
+    
     const currentUser = session.user as IUser;
-    const createdComment = await sanitySdk.createComment({ userId: currentUser._id, postId, comment });
+    const followingId = request.nextUrl.searchParams.get('followingId')!;
+    await sanitySdk.unFollow(currentUser._id, followingId);
 
     return NextResponse.json(
       {
         message: SUCCESS_CODE_MESSAGE,
-        data: createdComment,
       },
-      { status: SUCCESS_CODE }
+      {
+        status: SUCCESS_CODE,
+      }
     );
   } catch (error) {
+    console.error(error)
     return NextResponse.json(
       {
         message: SERVER_ERROR_MESSAGE,
       },
-      { status: SERVER_ERROR_CODE }
+      {
+        status: SERVER_ERROR_CODE,
+      }
     );
   }
 }

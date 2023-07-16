@@ -8,6 +8,8 @@ import unlikePost from './post/unlikePost';
 import createComment from './comment/create';
 import getSlugs from './user/getSlugs';
 import getUserBySlug from './user/getUserBySlug';
+import follow from './user/follow';
+import unFollow from './user/unFollow';
 
 const sanitySdk = {
   getUserByEmail,
@@ -20,6 +22,8 @@ const sanitySdk = {
   createComment,
   getSlugs,
   getUserBySlug,
+  follow,
+  unFollow,
 };
 
 export default sanitySdk;

@@ -17,24 +17,30 @@ export async function DELETE(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session) {
-      return NextResponse.json({
-        status: UNAUTHORIZED_CODE,
-        message: UNAUTHORIZED_MESSAGE,
-      });
+      return NextResponse.json(
+        {
+          message: UNAUTHORIZED_MESSAGE,
+        },
+        { status: UNAUTHORIZED_CODE }
+      );
     }
 
-    const body = await request.json();
     const currentUser = session.user as IUser;
-    await sanitySdk.unlikePost(currentUser._id, body.postId);
+    const postId = request.nextUrl.searchParams.get('postId')!;
+    await sanitySdk.unlikePost(currentUser._id, postId);
 
-    return NextResponse.json({
-      status: SUCCESS_CODE,
-      message: SUCCESS_CODE_MESSAGE,
-    });
+    return NextResponse.json(
+      {
+        message: SUCCESS_CODE_MESSAGE,
+      },
+      { status: SUCCESS_CODE }
+    );
   } catch (error) {
-    return NextResponse.json({
-      status: SERVER_ERROR_CODE,
-      message: SERVER_ERROR_MESSAGE,
-    });
+    return NextResponse.json(
+      {
+        message: SERVER_ERROR_MESSAGE,
+      },
+      { status: SERVER_ERROR_CODE }
+    );
   }
 }

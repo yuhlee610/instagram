@@ -11,7 +11,9 @@ export default async function (email: string) {
         emailVerified,
         createdAt,
         modifiedAt,
-        'liked': *[_type == "like" && author._ref == ^._id]
+        'liked': *[_type == "like" && author._ref == ^._id],
+        'followers': *[_type == "follow" && following._ref == ^._id],
+        'following': *[_type == "follow" && follower._ref == ^._id]
     }`,
     {
       email,

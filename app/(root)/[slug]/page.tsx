@@ -31,7 +31,7 @@ const Profile = async (props: IProfile) => {
 
   return (
     <div className="pb-12">
-      <ProfileHeader profile={profile} />
+      <ProfileHeader profile={profile} currentUser={currentUser} />
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 max-w-[935px] mx-auto mt-12">
         {profile.posts.map((post) => (
           <PostThumbnail
