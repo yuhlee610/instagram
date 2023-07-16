@@ -25,7 +25,12 @@ const AvatarComponent = (props: IAvatarComponent) => {
     <div
       className={`rounded-full ${sizeClassName} overflow-hidden relative ${className}`}
     >
-      <Image src={urlFor(image).url().toString()} alt="avatar" fill />
+      <Image
+        src={image ? urlFor(image).url().toString() : '/default-avatar.png'}
+        alt="avatar"
+        sizes="100%"
+        fill
+      />
     </div>
   );
 };

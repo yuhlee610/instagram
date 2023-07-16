@@ -17,9 +17,9 @@ exports.user = {
       type: 'string',
     },
     {
-      name: 'image',
-      title: 'Image',
-      type: 'url',
+      name: 'bio',
+      title: 'Bio',
+      type: 'string',
     },
     {
       name: 'avatar',
@@ -40,11 +40,6 @@ exports.user = {
       name: 'modifiedAt',
       title: 'Modified at',
       type: 'datetime',
-    },
-    {
-      name: 'password',
-      type: 'string',
-      hidden: true,
     },
     {
       name: 'emailVerified',

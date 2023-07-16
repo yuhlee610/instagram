@@ -1,6 +1,9 @@
+import PostThumbnail from '@/components/PostThumbnail/PostThumbnail';
 import ProfileHeader from '@/components/ProfileHeader/ProfileHeader';
+import { authOptions } from '@/pages/api/auth/[...nextauth]';
 import sanitySdk from '@/services';
 import { IUser } from '@/types/common';
+import { getServerSession } from 'next-auth';
 import React from 'react';
 
 interface IProfile {
@@ -23,10 +26,21 @@ export const dynamic =
 const Profile = async (props: IProfile) => {
   const { slug } = props.params;
   const profile: IUser = await sanitySdk.getUserBySlug(slug);
+  const session = await getServerSession(authOptions);
+  const currentUser = session?.user as IUser;
 
   return (
-    <div>
+    <div className="pb-12">
       <ProfileHeader profile={profile} />
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 max-w-[935px] mx-auto mt-12">
+        {profile.posts.map((post) => (
+          <PostThumbnail
+            key={post._id}
+            currentPost={post}
+            currentUser={currentUser}
+          />
+        ))}
+      </div>
     </div>
   );
 };

@@ -13,6 +13,7 @@ import { TbMessageCircle2 } from 'react-icons/tb';
 import AutoSizingTextarea from '../AutoSizingTextarea/AutoSizingTextarea';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import Comment from '../Comment/Comment';
+import Link from 'next/link';
 
 interface IPostComponent extends IPost, IClassName {
   onOpenModal: MouseEventHandler<SVGElement>;
@@ -73,6 +74,7 @@ const PostComponent = (props: IPostComponent) => {
     setLikeTotal((prevLikeTotal) => prevLikeTotal - 1);
   };
 
+
   const onSubmit: SubmitHandler<ICommentForm> = async (data) => {
     try {
       setIsSubmitting(true);
@@ -100,8 +102,12 @@ const PostComponent = (props: IPostComponent) => {
       <div
         className={`${headingClassName} flex items-center space-x-3 py-2 px-1`}
       >
-        <MediumAvatar image={author.avatar} />
-        <div className="font-semibold text-sm">{author.name}</div>
+        <Link href={`/${author.slug}`} className="font-semibold text-sm">
+          <MediumAvatar image={author.avatar} />
+        </Link>
+        <Link href={`/${author.slug}`} className="font-semibold text-sm">
+          {author.name}
+        </Link>
         <div className="text-sm text-slate-400">
           {formatCreatedAt(createdAt)}
         </div>
@@ -149,7 +155,9 @@ const PostComponent = (props: IPostComponent) => {
             : `${likeTotal} lượt thích`}
         </div>
         <div className="px-4 mb-2">
-          <span className="font-semibold text-sm mr-1">{author.name}</span>
+          <Link href={`/${author.slug}`} className="font-semibold text-sm mr-1">
+            {author.name}
+          </Link>
           <span className="text-sm">{caption}</span>
         </div>
         {showCommentInput && (

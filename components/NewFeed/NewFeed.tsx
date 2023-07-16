@@ -11,9 +11,9 @@ interface IPosts extends IClassName {
   user: IUser;
 }
 
-const PER_PAGE = 1;
+const PER_PAGE = 3;
 
-const Posts = (props: IPosts) => {
+const NewFeed = (props: IPosts) => {
   const { initialPosts, user } = props;
   const [posts, setPosts] = useState<IPost[]>(initialPosts);
   const lastPostRef = useRef<IPost | undefined>(
@@ -69,4 +69,4 @@ const Posts = (props: IPosts) => {
   );
 };
 
-export default Posts;
+export default NewFeed;

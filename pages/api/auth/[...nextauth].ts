@@ -20,10 +20,10 @@ export const authOptions: NextAuthOptions = {
     signIn: '/login',
   },
   callbacks: {
-    async session({ session, user, token }) {
+    async session({ session }) {
       if (session?.user?.email) {
         const dbUser = await sanitySdk.getUserByEmail(session?.user?.email);
-        session.user = dbUser
+        session.user = dbUser;
       }
       return session;
     },

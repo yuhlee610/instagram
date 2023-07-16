@@ -34,11 +34,13 @@ function SanityAdapter(client, options = {
         async createUser(profile) {
             const { emailVerified: tempEmailVerified, image, ...tempProfile } = profile;
             const { _id, emailVerified, ...user } = await client.create({
-                _id: `user.${uuid_1.uuid()}`,
-                _type: options.schemas.user,
-                emailVerified: tempEmailVerified === null ? undefined : tempEmailVerified,
-                slug: slugify(profile.name),
-                ...tempProfile
+              _id: `user.${uuid_1.uuid()}`,
+              _type: options.schemas.user,
+              emailVerified:
+                tempEmailVerified === null ? undefined : tempEmailVerified,
+              slug: slugify(profile.name),
+              createdAt: new Date(),
+              ...tempProfile,
             });
             return {
                 id: _id,

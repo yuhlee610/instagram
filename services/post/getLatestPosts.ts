@@ -7,7 +7,7 @@ interface IGetPostsQueryParams {
 }
 
 const getQuery = (queryParams: IGetPostsQueryParams) => {
-  const { perPage = 1, lastId, lastCreatedAt } = queryParams;
+  const { perPage = 3, lastId, lastCreatedAt } = queryParams;
   const start = 0;
   const end = perPage;
   if (!lastId || !lastCreatedAt) {
@@ -17,7 +17,8 @@ const getQuery = (queryParams: IGetPostsQueryParams) => {
       caption,
       author -> {
         name,
-        avatar
+        avatar,
+        slug
       },
       images,
       createdAt,
@@ -29,6 +30,7 @@ const getQuery = (queryParams: IGetPostsQueryParams) => {
         author -> {
           name,
           avatar,
+          slug
         }
       }
     }`,
@@ -42,7 +44,8 @@ const getQuery = (queryParams: IGetPostsQueryParams) => {
     caption,
     author -> {
       name,
-      avatar
+      avatar,
+      slug
     },
     images,
     createdAt,
@@ -53,7 +56,8 @@ const getQuery = (queryParams: IGetPostsQueryParams) => {
       createdAt,
       author -> {
         name,
-        avatar
+        avatar,
+        slug
       }
     }
   }`,

@@ -9,14 +9,14 @@ interface IProfileHeader {
   profile: IUser;
 }
 
-const MOBILE_BREAKPOINT= 768;
+const MOBILE_BREAKPOINT = 768;
 
 const ProfileHeader = (props: IProfileHeader) => {
   const {
     profile: { avatar, name, bio, posts },
   } = props;
-  console.log(props)
-  const isMobileLayout = window.innerWidth <= MOBILE_BREAKPOINT;
+  const isMobileLayout =
+    typeof window !== 'undefined' && window.innerWidth <= MOBILE_BREAKPOINT;
 
   return (
     <div className="max-w-[935px] mx-auto p-4 md:py-7 md:px-10 grid grid-cols-[min-content_1fr] md:grid-cols-[min-content_1fr_1fr_1fr] gap-x-[28px] border-b border-b-slate-300">

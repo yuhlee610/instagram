@@ -1,5 +1,5 @@
 import React from 'react';
-import Posts from '@/components/Posts/Posts';
+import NewFeed from '@/components/NewFeed/NewFeed';
 import { authOptions } from '@/pages/api/auth/[...nextauth]';
 import sanitySdk from '@/services';
 import { IUser } from '@/types/common';
@@ -12,7 +12,7 @@ const Home = async () => {
 
   return (
     <div className="flex justify-center mb-11">
-      <Posts initialPosts={posts} user={user} />
+      <NewFeed initialPosts={posts} user={user} />
     </div>
   );
 };
