@@ -8,8 +8,13 @@ import ProfileLink from '../ProfileLink/ProfileLink';
 import Popover from '../Popover/Popover';
 import LogoutButton from '../LogoutButton/LogoutButton';
 import Menu from '../Menu/Menu';
+import { IUser } from '@/types/common';
 
-const NavigationBar = () => {
+interface INavigationBar {
+  currentUser: IUser;
+}
+
+const NavigationBar = (props: INavigationBar) => {
   return (
     <nav className="fixed z-20 bg-white h-[52px] w-full flex justify-evenly bottom-0 border-t border-gray-200 items-center md:flex-col md:h-screen md:w-20 md:border-r md:justify-normal xl:w-60 xl:items-start xl:px-3">
       <Logo
@@ -21,7 +26,7 @@ const NavigationBar = () => {
       <ExploreLink />
       <NewPostLink />
       <InboxLink />
-      <ProfileLink />
+      <ProfileLink currentUser={props.currentUser} />
       <Popover
         content={<LogoutButton />}
         displayCondition="click"
