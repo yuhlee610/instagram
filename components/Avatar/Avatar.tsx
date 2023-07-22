@@ -15,6 +15,7 @@ interface IAvatarComponent extends IAvatar {
 const classWithSize = {
   small: 'w-[28px] h-[28px] min-w-[28px]',
   medium: 'w-[38px] h-[38px] min-w-[38px]',
+  intermediate: 'w-[55px] h-[55px] min-w-[55px]',
   large: 'w-[77px] h-[77px] min-w-[77px]',
   xlarge: 'w-[150px] h-[150px] min-w-[150px]',
 };
@@ -41,6 +42,10 @@ export const SmallAvatar = (props: IAvatar) => (
 
 export const MediumAvatar = (props: IAvatar) => (
   <AvatarComponent {...props} sizeClassName={classWithSize['medium']} />
+);
+
+export const IntermediateAvatar = (props: IAvatar) => (
+  <AvatarComponent {...props} sizeClassName={classWithSize['intermediate']} />
 );
 
 export const LargeAvatar = (props: IAvatar) => (

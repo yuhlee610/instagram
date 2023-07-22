@@ -1,7 +1,7 @@
 'use client';
 
 import useClickOutSide from '@/hooks/useClickOutside';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 interface IPopover {
   children: React.ReactNode;
@@ -24,16 +24,15 @@ const Popover = (props: IPopover) => {
     className,
   } = props;
   const [isDisplay, setIsDisplay] = useState<boolean>(false);
+  const hideTip = useCallback(() => {
+    setIsDisplay(false);
+    onCloseCallback();
+  }, [onCloseCallback]);
   const containerRef = useClickOutSide<HTMLDivElement>(hideTip);
 
   const showTip = () => {
     setIsDisplay(true);
     onOpenCallback();
-  };
-
-  function hideTip() {
-    setIsDisplay(false);
-    onCloseCallback();
   };
 
   const handleClickChildCpn = () => {
@@ -53,7 +52,7 @@ const Popover = (props: IPopover) => {
     document.addEventListener('mousedown', handleClickOutside);
 
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [hideTip, containerRef]);
 
   const wrapperEvent =
     displayCondition === 'hover'
@@ -65,8 +64,12 @@ const Popover = (props: IPopover) => {
           onClick: handleClickChildCpn,
         };
   return (
-    <div ref={containerRef} className={`relative ${className}`}>
-      <div {...wrapperEvent}>{children}</div>
+    <div
+      ref={containerRef}
+      className={`relative ${className}`}
+      {...wrapperEvent}
+    >
+      <div>{children}</div>
       {isDisplay && (
         <div
           className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none ${menuClasses}`}

@@ -2,7 +2,7 @@
 
 import React, { useState, MouseEventHandler } from 'react';
 import { IClassName, IComment, IPost, IUser } from '@/types/common';
-import { MediumAvatar } from '../Avatar/Avatar';
+import { IntermediateAvatar, MediumAvatar } from '../Avatar/Avatar';
 import { formatCreatedAt } from '@/lib/dates';
 import SwiperCarousel from '../SwiperCarousel/SwiperCarousel';
 import { SwiperSlide } from 'swiper/react';
@@ -14,6 +14,9 @@ import AutoSizingTextarea from '../AutoSizingTextarea/AutoSizingTextarea';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import Comment from '../Comment/Comment';
 import Link from 'next/link';
+import Popover from '../Popover/Popover';
+import Button from '../Button/Button';
+import { formatTotalNumber } from '@/lib/posts';
 
 interface IPostComponent extends IPost, IClassName {
   onOpenModal: MouseEventHandler<SVGElement>;
@@ -55,6 +58,19 @@ const PostComponent = (props: IPostComponent) => {
   const [comments, setComments] = useState<IComment[]>(initialComments);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const isSubmitButtonActive = !!watch('comment');
+  const {
+    name,
+    avatar,
+    slug,
+    bio,
+    postsTotal,
+    followers,
+    following,
+    threeLatestPosts,
+  } = author;
+  const formattedThreeLatestPosts = threeLatestPosts
+    ?.map((post) => post.images)
+    .flatMap((image) => image);
 
   const onLike = async () => {
     await fetch('/api/post/like', {
@@ -95,17 +111,74 @@ const PostComponent = (props: IPostComponent) => {
     }
   };
 
+  const authorPopupContent = (
+    <div className="py-3">
+      <div className="flex items-center px-2 gap-2 pb-3">
+        <Link href={`/${slug}`} className="font-semibold text-sm">
+          <IntermediateAvatar image={avatar} />
+        </Link>
+        <div>
+          <Link href={`/${slug}`} className="font-semibold text-sm">
+            {name}
+          </Link>
+          <div className="text-sm">{bio}</div>
+        </div>
+      </div>
+      <div className="py-3 px-2 flex justify-between">
+        <div className="text-sm text-center">
+          <strong>{formatTotalNumber(postsTotal)}</strong> bài viết
+        </div>
+        <div className="text-sm text-center">
+          <strong>{formatTotalNumber(followers.length)}</strong> người theo dõi
+        </div>
+        <div className="text-sm text-center">
+          <strong>{formatTotalNumber(following.length)}</strong> đang theo dõi
+        </div>
+      </div>
+      <div className="flex gap-1">
+        {formattedThreeLatestPosts?.map((image) => (
+          <div
+            className="relative flex-1 after:content-[''] after:block after:pb-[100%]"
+            key={image._key + _id}
+          >
+            <Image
+              className="object-cover"
+              src={sanitySdk.urlFor(image).toString()}
+              fill
+              alt=""
+            />
+          </div>
+        ))}
+      </div>
+      <Button onClick={() => {}} className="ml-auto mt-3 mr-3 block">
+        Nhắn tin
+      </Button>
+    </div>
+  );
+
   return (
     <div className={`${className} grid w-full`}>
       <div
         className={`${headingClassName} flex items-center space-x-3 py-2 px-1`}
       >
-        <Link href={`/${author.slug}`} className="font-semibold text-sm">
-          <MediumAvatar image={author.avatar} />
-        </Link>
-        <Link href={`/${author.slug}`} className="font-semibold text-sm">
-          {author.name}
-        </Link>
+        <Popover
+          content={authorPopupContent}
+          displayCondition="hover"
+          menuClasses="w-[365px] top-[100%] left-0 before:content-[''] before:absolute before:w-full before:h-3 before:bg-transparent before:bottom-[100%]"
+        >
+          <Link href={`/${slug}`} className="font-semibold text-sm">
+            <MediumAvatar image={avatar} />
+          </Link>
+        </Popover>
+        <Popover
+          content={authorPopupContent}
+          displayCondition="hover"
+          menuClasses="w-[365px] top-[100%] left-0 before:content-[''] before:absolute before:w-full before:h-3 before:bg-transparent before:bottom-[100%]"
+        >
+          <Link href={`/${slug}`} className="font-semibold text-sm">
+            {name}
+          </Link>
+        </Popover>
         <div className="text-sm text-slate-400">
           {formatCreatedAt(createdAt)}
         </div>
@@ -153,8 +226,8 @@ const PostComponent = (props: IPostComponent) => {
             : `${likeTotal} lượt thích`}
         </div>
         <div className="px-4 mb-2">
-          <Link href={`/${author.slug}`} className="font-semibold text-sm mr-1">
-            {author.name}
+          <Link href={`/${slug}`} className="font-semibold text-sm mr-1">
+            {name}
           </Link>
           <span className="text-sm">{caption}</span>
         </div>

@@ -46,4 +46,6 @@ const AutoSizingTextarea = React.forwardRef<HTMLTextAreaElement, IAutoSizingText
   }
 );
 
+AutoSizingTextarea.displayName = 'AutoSizingTextarea';
+
 export default AutoSizingTextarea;

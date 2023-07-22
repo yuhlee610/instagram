@@ -9,8 +9,7 @@ export interface IReference {
   _ref: string;
 }
 
-export interface IPostRef extends IPost, IReference {
-}
+export interface IPostRef extends IPost, IReference {}
 
 export interface IFollow {
   _id: string;
@@ -48,8 +47,12 @@ export interface IUser {
   bio: string;
   liked: ILike[];
   posts: IPost[];
+  postsTotal: number;
   following: IFollow[];
   followers: IFollow[];
+  threeLatestPosts?: {
+    images: Image[];
+  }[];
 }
 
 export interface IClassName {

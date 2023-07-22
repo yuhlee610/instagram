@@ -5,6 +5,7 @@ import React, { useRef, useState } from 'react';
 import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 import { PiSpinnerGap } from 'react-icons/pi';
 import NewFeedPost from '../NewFeedPost/NewFeedPost';
+import { uniqBy } from 'lodash';
 
 interface IPosts extends IClassName {
   initialPosts: IPost[];
@@ -36,12 +37,12 @@ const NewFeed = (props: IPosts) => {
       .then((response) => response.json())
       .then((data) => {
         lastPostRef.current = data.data.findLast((post: IPost) => post);
-        setPosts((prevPosts) => [...prevPosts, ...data.data]);
-        setLoading(false);
+        setPosts((prevPosts) => uniqBy([...prevPosts, ...data.data], '_id'));
       })
       .catch((error) => {
-        setLoading(false);
         console.error(error);
+      }).finally(() => {
+        setLoading(false);
       });
   };
   const observerTarget = useInfiniteScroll<HTMLDivElement>(observerHandler);

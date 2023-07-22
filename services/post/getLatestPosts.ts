@@ -16,9 +16,17 @@ const getQuery = (queryParams: IGetPostsQueryParams) => {
       _id,
       caption,
       author -> {
+        _id,
         name,
         avatar,
-        slug
+        slug,
+        bio,
+        'postsTotal': count(*[_type == "post" && author._ref == ^._id]),
+        'followers': *[_type == "follow" && following._ref == ^._id],
+        'following': *[_type == "follow" && user._ref == ^._id],
+        'threeLatestPosts': *[_type == "post"] | order(createdAt desc) [0...3]{
+          images[0]
+        }
       },
       images,
       createdAt,
@@ -43,9 +51,17 @@ const getQuery = (queryParams: IGetPostsQueryParams) => {
     _id,
     caption,
     author -> {
+      _id,
       name,
       avatar,
-      slug
+      slug,
+      bio,
+      'postsTotal': count(*[_type == "post" && author._ref == ^._id]),
+      'followers': *[_type == "follow" && following._ref == ^._id],
+      'following': *[_type == "follow" && user._ref == ^._id],
+      'threeLatestPosts': *[_type == "post"] | order(createdAt desc) [0...3]{
+        images[0]
+      }
     },
     images,
     createdAt,
