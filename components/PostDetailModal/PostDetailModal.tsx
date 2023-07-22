@@ -41,6 +41,8 @@ const PostDetailModal = (props: IPostDetailModal) => {
             headingClassName={`${headingClassName} md:col-start-2 md:col-end-3 md:pl-4 md:border-b-[1px] md:border-b-slate-200`}
             swiperClassName={`${swiperClassName} h-[490px] md:h-full md:col-span-1 md:row-start-1 md:row-end-4`}
             actionsClassName={`${actionsClassName} md:col-span-2 md:row-start-3 md:border-t-[1px] md:border-t-slate-200`}
+            showCommentInput
+            showComments
             {...rest}
           />
         </div>
