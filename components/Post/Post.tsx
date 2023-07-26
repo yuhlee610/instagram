@@ -19,7 +19,6 @@ import Button from '../Button/Button';
 import { formatTotalNumber } from '@/lib/posts';
 import {
   InfiniteData,
-  Updater,
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query';
@@ -44,12 +43,21 @@ const PostComponent = (props: IPostComponent) => {
   const {
     post: {
       _id,
-      author,
+      author: {
+        name,
+        avatar,
+        slug,
+        bio,
+        postsTotal,
+        followers,
+        following,
+        threeLatestPosts,
+      },
       caption,
       images,
       createdAt,
       likes,
-      comments: initialComments,
+      comments,
     },
     isPostLiked,
     onOpenModal,
@@ -76,21 +84,34 @@ const PostComponent = (props: IPostComponent) => {
       updateTotalLike({ isLiked: false });
     },
   });
+  const { mutateAsync: commentMutate, isLoading } = useMutation({
+    mutationFn: handleComment,
+    onSuccess(newComment) {
+      queryClient.setQueryData<InfiniteData<IPost[]>>(
+        ['newFeedPosts'],
+        (oldData) => {
+          const newData = oldData?.pages.map((page) =>
+            page.map((item) => {
+              if (item._id === _id) {
+                return {
+                  ...item,
+                  comments: [
+                    { ...newComment.data, author: currentUser },
+                    ...item.comments,
+                  ],
+                };
+              }
+              return item;
+            })
+          );
+          return { ...oldData, pages: newData } as InfiniteData<IPost[]>;
+        }
+      );
+    },
+  });
 
-  const { register, handleSubmit, watch } = useForm<ICommentForm>();
-  const [comments, setComments] = useState<IComment[]>(initialComments);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const { register, handleSubmit, watch, reset } = useForm<ICommentForm>();
   const isSubmitButtonActive = !!watch('comment');
-  const {
-    name,
-    avatar,
-    slug,
-    bio,
-    postsTotal,
-    followers,
-    following,
-    threeLatestPosts,
-  } = author;
   const formattedThreeLatestPosts = threeLatestPosts
     ?.map((post) => post.images)
     .flatMap((image) => image);
@@ -124,26 +145,17 @@ const PostComponent = (props: IPostComponent) => {
     );
   }
 
+  async function handleComment(data: ICommentForm) {
+    const response = await fetch('/api/post/comment', {
+      method: 'POST',
+      body: JSON.stringify({ ...data, postId: _id }),
+    });
+    return await response.json();
+  }
+
   const onSubmit: SubmitHandler<ICommentForm> = async (data) => {
-    try {
-      setIsSubmitting(true);
-      const response = await fetch('/api/post/comment', {
-        method: 'POST',
-        body: JSON.stringify({ ...data, postId: _id }),
-      });
-      const createdComment = await response.json();
-      setComments([
-        {
-          ...createdComment.data,
-          author: currentUser,
-        },
-        ...comments,
-      ]);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsSubmitting(false);
-    }
+    await commentMutate(data);
+    reset({ comment: '' });
   };
 
   const authorPopupContent = (
@@ -233,7 +245,7 @@ const PostComponent = (props: IPostComponent) => {
         ))}
       </SwiperCarousel>
       {showComments && (
-        <div className="hidden md:block col-span-2 row-start-2 row-end-3 p-4 max-h-[410px] overflow-auto">
+        <div className="hidden md:block col-span-2 row-start-2 row-end-3 p-4 overflow-auto">
           {comments.map((comment) => (
             <Comment key={comment._id} {...comment} />
           ))}
@@ -266,10 +278,10 @@ const PostComponent = (props: IPostComponent) => {
           <Link href={`/${slug}`} className="font-semibold text-sm mr-1">
             {name}
           </Link>
-          <span className="text-sm">{caption}</span>
+          <span className="text-sm whitespace-pre">{caption}</span>
         </div>
         {showCommentInput && (
-          <div className="flex h-9 px-4">
+          <div className="flex h-9 px-4 mb-3">
             <div className="overflow-y-auto flex-grow gap-2">
               <AutoSizingTextarea
                 {...register('comment', { required: true })}
@@ -279,12 +291,12 @@ const PostComponent = (props: IPostComponent) => {
             </div>
             <button
               className={`text-sm font-semibold ${
-                isSubmitButtonActive && !isSubmitting
+                isSubmitButtonActive && !isLoading
                   ? 'text-sky-500'
                   : 'text-sky-200'
               }`}
               onClick={handleSubmit(onSubmit)}
-              disabled={!isSubmitButtonActive || isSubmitting}
+              disabled={!isSubmitButtonActive || isLoading}
             >
               Đăng
             </button>

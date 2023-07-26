@@ -18,7 +18,7 @@ const Comment = (props: ICommentComponent) => {
           <Link href={`/${author.slug}`}>
             <span className="text-sm font-semibold mr-2">{author.name}</span>
           </Link>
-          <span className="text-sm">{content}</span>
+          <span className="text-sm whitespace-pre">{content}</span>
         </div>
         <div className="text-xs text-slate-400">
           {formatCreatedAt(createdAt)}
