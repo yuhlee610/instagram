@@ -17,8 +17,14 @@ import Link from 'next/link';
 import Popover from '../Popover/Popover';
 import Button from '../Button/Button';
 import { formatTotalNumber } from '@/lib/posts';
+import {
+  InfiniteData,
+  Updater,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query';
 
-interface IPostComponent extends IPost, IClassName {
+interface IPostComponent extends IClassName {
   onOpenModal: MouseEventHandler<SVGElement>;
   swiperClassName?: string;
   headingClassName?: string;
@@ -27,6 +33,7 @@ interface IPostComponent extends IPost, IClassName {
   showComments?: boolean;
   isPostLiked: boolean;
   currentUser: IUser;
+  post: IPost;
 }
 
 interface ICommentForm {
@@ -35,25 +42,41 @@ interface ICommentForm {
 
 const PostComponent = (props: IPostComponent) => {
   const {
-    _id,
-    author,
-    caption,
-    images,
-    createdAt,
-    likes,
+    post: {
+      _id,
+      author,
+      caption,
+      images,
+      createdAt,
+      likes,
+      comments: initialComments,
+    },
     isPostLiked,
     onOpenModal,
     swiperClassName = '',
     headingClassName = '',
     actionsClassName = '',
-    className = '',
     showCommentInput = false,
     showComments = false,
-    comments: initialComments,
     currentUser,
+    className = '',
   } = props;
-  const [isLiked, setIsLiked] = useState<boolean>(isPostLiked);
-  const [likeTotal, setLikeTotal] = useState<number>(likes);
+  const queryClient = useQueryClient();
+  const likeMutation = useMutation({
+    mutationFn: handleLike,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+      updateTotalLike({ isLiked: true });
+    },
+  });
+  const unlikeMutation = useMutation({
+    mutationFn: handleUnlike,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+      updateTotalLike({ isLiked: false });
+    },
+  });
+
   const { register, handleSubmit, watch } = useForm<ICommentForm>();
   const [comments, setComments] = useState<IComment[]>(initialComments);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -72,22 +95,34 @@ const PostComponent = (props: IPostComponent) => {
     ?.map((post) => post.images)
     .flatMap((image) => image);
 
-  const onLike = async () => {
+  async function handleLike() {
     await fetch('/api/post/like', {
       method: 'POST',
       body: JSON.stringify({ postId: _id }),
     });
-    setIsLiked((prev) => !prev);
-    setLikeTotal((prevLikeTotal) => prevLikeTotal + 1);
-  };
+  }
 
-  const onUnlike = async () => {
+  async function handleUnlike() {
     await fetch(`/api/post/unlike?postId=${_id}`, {
       method: 'DELETE',
     });
-    setIsLiked((prev) => !prev);
-    setLikeTotal((prevLikeTotal) => prevLikeTotal - 1);
-  };
+  }
+
+  function updateTotalLike({ isLiked }: { isLiked: boolean }) {
+    queryClient.setQueryData<InfiniteData<IPost[]>>(
+      ['newFeedPosts'],
+      (oldData) => {
+        const newData = oldData?.pages.map((page) =>
+          page.map((item) =>
+            item._id === _id
+              ? { ...item, likes: item.likes + (isLiked ? 1 : -1) }
+              : item
+          )
+        );
+        return { ...oldData, pages: newData } as InfiniteData<IPost[]>;
+      }
+    );
+  }
 
   const onSubmit: SubmitHandler<ICommentForm> = async (data) => {
     try {
@@ -156,6 +191,8 @@ const PostComponent = (props: IPostComponent) => {
     </div>
   );
 
+  const likeLoading = likeMutation.isLoading || unlikeMutation.isLoading;
+
   return (
     <div className={`${className} grid w-full`}>
       <div
@@ -204,15 +241,15 @@ const PostComponent = (props: IPostComponent) => {
       )}
       <div className={`${actionsClassName}`}>
         <div className="flex px-3">
-          {isLiked ? (
+          {likeLoading ? null : isPostLiked ? (
             <AiTwotoneHeart
               className="p-2 pl-0 h-10 w-10 scale-110 cursor-pointer fill-red-600"
-              onClick={onUnlike}
+              onClick={() => !likeLoading && unlikeMutation.mutate()}
             />
           ) : (
             <AiOutlineHeart
               className="p-2 pl-0 h-10 w-10 scale-110 cursor-pointer"
-              onClick={onLike}
+              onClick={() => !likeLoading && likeMutation.mutate()}
             />
           )}
           <TbMessageCircle2
@@ -221,9 +258,9 @@ const PostComponent = (props: IPostComponent) => {
           />
         </div>
         <div className="font-semibold text-sm px-4 mb-2">
-          {likeTotal === 0
+          {likes === 0
             ? 'Hãy là người đầu tiên thích bài viết'
-            : `${likeTotal} lượt thích`}
+            : `${likes} lượt thích`}
         </div>
         <div className="px-4 mb-2">
           <Link href={`/${slug}`} className="font-semibold text-sm mr-1">

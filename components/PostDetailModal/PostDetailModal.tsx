@@ -5,7 +5,7 @@ import Modal from '../Modal/Modal';
 import { IClassName, IPost, IUser } from '@/types/common';
 import PostComponent from '../Post/Post';
 
-interface IPostDetailModal extends IPost, IClassName {
+interface IPostDetailModal extends IClassName {
   isOpenModal: boolean;
   onClose: Function;
   onOpenModal: MouseEventHandler<SVGElement>;
@@ -16,6 +16,7 @@ interface IPostDetailModal extends IPost, IClassName {
   showComments?: boolean;
   isPostLiked: boolean;
   currentUser: IUser;
+  post: IPost;
 }
 
 const PostDetailModal = (props: IPostDetailModal) => {
@@ -32,7 +33,7 @@ const PostDetailModal = (props: IPostDetailModal) => {
     <Modal
       isOpen={isOpenModal}
       onClose={onClose}
-      id={`post-detail-${props._id}`}
+      id={`post-detail-${props.post._id}`}
     >
       <div className="h-full flex items-center justify-center">
         <div className="w-[470px] md:w-[80%] md:max-w-[916px] md:h-[80%] xl:h-[741px] bg-slate-50 rounded-md">

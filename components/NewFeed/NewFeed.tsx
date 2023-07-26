@@ -5,11 +5,9 @@ import React, { useEffect, useRef } from 'react';
 import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 import { PiSpinnerGap } from 'react-icons/pi';
 import NewFeedPost from '../NewFeedPost/NewFeedPost';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 
-interface IPosts extends IClassName {
-  user: IUser;
-}
+interface INewFeed extends IClassName {}
 
 interface INextPageParam {
   lastId: string;
@@ -19,8 +17,7 @@ interface INextPageParam {
 
 const PER_PAGE = 3;
 
-const NewFeed = (props: IPosts) => {
-  const { user } = props;
+const NewFeed = (props: INewFeed) => {
   const observerTarget = useRef<HTMLDivElement>(null);
   const isOnView = useInfiniteScroll(observerTarget);
   const nextPageParamRef = useRef<INextPageParam>({
@@ -29,7 +26,7 @@ const NewFeed = (props: IPosts) => {
     hasNextPage: true,
   });
   const { data, fetchNextPage, isFetchingNextPage } = useInfiniteQuery({
-    queryKey: ['new-feed-posts'],
+    queryKey: ['newFeedPosts'],
     queryFn: async () => {
       const { lastId, lastCreatedAt, hasNextPage } = nextPageParamRef.current;
 
@@ -60,6 +57,14 @@ const NewFeed = (props: IPosts) => {
     },
     refetchOnWindowFocus: false,
   });
+  const { data: currentUser } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: async () => {
+      const response = await fetch('/api/user');
+      const data = await response.json();
+      return data.data as IUser;
+    },
+  });
 
   useEffect(() => {
     if (isOnView && !!nextPageParamRef.current.lastId) {
@@ -68,19 +73,21 @@ const NewFeed = (props: IPosts) => {
   }, [isOnView]);
 
   return (
-    <div className="flex flex-col space-y-4 mb-4 mt-6 w-full justify-center items-center">
+    <div
+      className={`flex flex-col space-y-4 mb-4 mt-6 w-full justify-center items-center ${props.className}`}
+    >
       {data?.pages.map((group, i) => (
         <React.Fragment key={i}>
           {group.map((post: IPost) => {
-            const isPostLiked = !!user.liked.find(
+            const isPostLiked = !!currentUser?.liked.find(
               (likedPost) => likedPost.post._ref === post._id
             );
             return (
               <NewFeedPost
                 key={post._id}
-                currentUser={user}
+                currentUser={currentUser!}
                 isPostLiked={isPostLiked}
-                {...post}
+                post={post}
               />
             );
           })}

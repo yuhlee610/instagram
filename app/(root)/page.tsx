@@ -9,18 +9,19 @@ import { dehydrate, Hydrate } from '@tanstack/react-query';
 
 const Home = async () => {
   const queryClient = getQueryClient();
-  await queryClient.prefetchInfiniteQuery(
-    ['new-feed-posts'],
-    () => sanitySdk.getLatestPosts({}),
+  await queryClient.prefetchInfiniteQuery(['newFeedPosts'], () =>
+    sanitySdk.getLatestPosts({})
   );
+  await queryClient.prefetchQuery(['currentUser'], async () => {
+    const session = await getServerSession(authOptions);
+    return session?.user as IUser;
+  });
   const dehydratedState = dehydrate(queryClient);
-  const session = await getServerSession(authOptions);
-  const user = session?.user as IUser;
 
   return (
     <div className="flex justify-center mb-11">
       <Hydrate state={dehydratedState}>
-        <NewFeed user={user} />
+        <NewFeed />
       </Hydrate>
     </div>
   );

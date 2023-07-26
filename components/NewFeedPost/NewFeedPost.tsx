@@ -1,11 +1,12 @@
-import { IPost, IUser } from '@/types/common';
+import { IClassName, IPost, IUser } from '@/types/common';
 import React, { useState } from 'react';
 import Post from '../Post/Post';
 import PostDetailModal from '../PostDetailModal/PostDetailModal';
 
-interface INewFeedPost extends IPost {
+interface INewFeedPost extends IClassName {
   currentUser: IUser;
   isPostLiked: boolean;
+  post: IPost;
 }
 
 const NewFeedPost = (props: INewFeedPost) => {
@@ -13,7 +14,9 @@ const NewFeedPost = (props: INewFeedPost) => {
 
   return (
     <>
-      <div className="max-w-[470px] w-full pb-5 md:border-b-[1px] border-b-slate-200">
+      <div
+        className={`max-w-[470px] w-full pb-5 md:border-b-[1px] border-b-slate-200 ${props.className}`}
+      >
         <Post
           onOpenModal={() => setIsOpenModal(true)}
           className="grid-cols-1"
