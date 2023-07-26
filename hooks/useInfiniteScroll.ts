@@ -1,14 +1,14 @@
-import { useEffect, useRef } from 'react';
+import { RefObject, useEffect, useState } from 'react';
 
-function useInfiniteScroll<T extends HTMLElement>(callback: Function) {
-  const observerTarget = useRef<T>(null);
+function useInfiniteScroll<T extends HTMLElement>(
+  observerTarget: RefObject<T>
+) {
+  const [isOnView, setIsOnView] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
-          callback();
-        }
+        setIsOnView(entries[0].isIntersecting);
       },
       { threshold: 1 }
     );
@@ -24,7 +24,7 @@ function useInfiniteScroll<T extends HTMLElement>(callback: Function) {
     };
   }, [observerTarget]);
 
-  return observerTarget;
+  return isOnView;
 }
 
-export default useInfiniteScroll
+export default useInfiniteScroll;

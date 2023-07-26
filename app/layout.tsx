@@ -2,6 +2,7 @@ import { ILayout } from '@/types/common';
 import './globals.css'
 import { Inter } from 'next/font/google'
 import SessionProvider from '@/components/SessionProvider/SessionProvider';
+import QueryClientProvider from '../components/QueryClientProvider/QueryClientProvider';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -14,7 +15,11 @@ export default function RootLayout({ children }: ILayout) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <SessionProvider>{children}</SessionProvider>
+        <SessionProvider>
+          <QueryClientProvider>
+            {children}
+          </QueryClientProvider>
+        </SessionProvider>
       </body>
     </html>
   );

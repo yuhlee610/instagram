@@ -13,6 +13,7 @@ import {
 } from '@/lib/errors';
 
 const CAPTION_KEY = 'caption';
+const DEFAULT_PER_PAGE = 3;
 
 export async function POST(request: NextRequest) {
   try {
@@ -69,13 +70,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const perPage = request.nextUrl.searchParams.get('perPage') || 10;
-    const lastId = request.nextUrl.searchParams.get('lastId') || '';
-    const lastCreatedAt =
-      request.nextUrl.searchParams.get('lastCreatedAt') || new Date().toJSON();
+    const perPage = request.nextUrl.searchParams.get('perPage');
+    const lastId = request.nextUrl.searchParams.get('lastId')!;
+    const lastCreatedAt = request.nextUrl.searchParams.get('lastCreatedAt')!;
 
     const posts = await sanitySdk.getLatestPosts({
-      perPage: +perPage,
+      perPage: +(perPage ?? DEFAULT_PER_PAGE),
       lastId,
       lastCreatedAt,
     });

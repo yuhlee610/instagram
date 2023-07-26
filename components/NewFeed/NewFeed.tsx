@@ -1,69 +1,93 @@
 'use client';
 
 import { IClassName, IPost, IUser } from '@/types/common';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 import { PiSpinnerGap } from 'react-icons/pi';
 import NewFeedPost from '../NewFeedPost/NewFeedPost';
-import { uniqBy } from 'lodash';
+import { useInfiniteQuery } from '@tanstack/react-query';
 
 interface IPosts extends IClassName {
-  initialPosts: IPost[];
   user: IUser;
+}
+
+interface INextPageParam {
+  lastId: string;
+  lastCreatedAt: string;
+  hasNextPage: boolean;
 }
 
 const PER_PAGE = 3;
 
 const NewFeed = (props: IPosts) => {
-  const { initialPosts, user } = props;
-  const [posts, setPosts] = useState<IPost[]>(initialPosts);
-  const lastPostRef = useRef<IPost | undefined>(
-    initialPosts[initialPosts.length - 1]
-  );
-  const [loading, setLoading] = useState<boolean>(false);
+  const { user } = props;
+  const observerTarget = useRef<HTMLDivElement>(null);
+  const isOnView = useInfiniteScroll(observerTarget);
+  const nextPageParamRef = useRef<INextPageParam>({
+    lastId: '',
+    lastCreatedAt: '',
+    hasNextPage: true,
+  });
+  const { data, fetchNextPage, isFetchingNextPage } = useInfiniteQuery({
+    queryKey: ['new-feed-posts'],
+    queryFn: async () => {
+      const { lastId, lastCreatedAt, hasNextPage } = nextPageParamRef.current;
 
-  const observerHandler = () => {
-    const lastPost = lastPostRef.current;
+      if (!hasNextPage) {
+        return Promise.resolve([]);
+      }
 
-    if (!lastPost) return;
+      const response = await fetch(
+        `/api/post?lastId=${lastId}&lastCreatedAt=${lastCreatedAt}&perPage=${PER_PAGE}`
+      );
 
-    const { _id, createdAt } = lastPost;
+      const data = await response.json();
+      const posts = data.data as IPost[];
+      const lastPost = posts.findLast((post: IPost) => post);
 
-    setLoading(true);
+      nextPageParamRef.current = {
+        lastId: lastPost?._id || '',
+        lastCreatedAt: lastPost?.createdAt || '',
+        hasNextPage: !!lastPost,
+      };
 
-    fetch(
-      `/api/post?lastId=${_id}&lastCreatedAt=${createdAt}&perPage=${PER_PAGE}`
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        lastPostRef.current = data.data.findLast((post: IPost) => post);
-        setPosts((prevPosts) => uniqBy([...prevPosts, ...data.data], '_id'));
-      })
-      .catch((error) => {
-        console.error(error);
-      }).finally(() => {
-        setLoading(false);
-      });
-  };
-  const observerTarget = useInfiniteScroll<HTMLDivElement>(observerHandler);
+      return posts;
+    },
+    getNextPageParam: (_, allPages) => {
+      return nextPageParamRef.current.hasNextPage
+        ? allPages.length + 1
+        : undefined;
+    },
+    refetchOnWindowFocus: false,
+  });
+
+  useEffect(() => {
+    if (isOnView && !!nextPageParamRef.current.lastId) {
+      fetchNextPage();
+    }
+  }, [isOnView]);
 
   return (
     <div className="flex flex-col space-y-4 mb-4 mt-6 w-full justify-center items-center">
-      {posts.map((post) => {
-        const isPostLiked = !!user.liked.find(
-          (likedPost) => likedPost.post._ref === post._id
-        );
-        return (
-          <NewFeedPost
-            key={post._id}
-            currentUser={user}
-            isPostLiked={isPostLiked}
-            {...post}
-          />
-        );
-      })}
+      {data?.pages.map((group, i) => (
+        <React.Fragment key={i}>
+          {group.map((post: IPost) => {
+            const isPostLiked = !!user.liked.find(
+              (likedPost) => likedPost.post._ref === post._id
+            );
+            return (
+              <NewFeedPost
+                key={post._id}
+                currentUser={user}
+                isPostLiked={isPostLiked}
+                {...post}
+              />
+            );
+          })}
+        </React.Fragment>
+      ))}
       <div ref={observerTarget} />
-      {loading && (
+      {isFetchingNextPage && (
         <PiSpinnerGap className="animate-spin w-6 h-6 mx-auto mt-4" />
       )}
     </div>
