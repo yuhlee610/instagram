@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, MouseEventHandler } from 'react';
+import React, { MouseEventHandler } from 'react';
 import { IClassName, IComment, IPost, IUser } from '@/types/common';
 import { IntermediateAvatar, MediumAvatar } from '../Avatar/Avatar';
 import { formatCreatedAt } from '@/lib/dates';
@@ -253,7 +253,7 @@ const PostComponent = (props: IPostComponent) => {
       )}
       <div className={`${actionsClassName}`}>
         <div className="flex px-3">
-          {likeLoading ? null : isPostLiked ? (
+          {isPostLiked ? (
             <AiTwotoneHeart
               className="p-2 pl-0 h-10 w-10 scale-110 cursor-pointer fill-red-600"
               onClick={() => !likeLoading && unlikeMutation.mutate()}

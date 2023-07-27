@@ -1,10 +1,12 @@
-import PostThumbnail from '@/components/PostThumbnail/PostThumbnail';
-import ProfileHeader from '@/components/ProfileHeader/ProfileHeader';
 import { authOptions } from '@/pages/api/auth/[...nextauth]';
 import sanitySdk from '@/services';
 import { IUser } from '@/types/common';
+import getQueryClient from '@/utils/getQueryClient';
+import { Hydrate, dehydrate } from '@tanstack/react-query';
 import { getServerSession } from 'next-auth';
 import React from 'react';
+import ProfileHeader from '@/components/ProfileHeader/ProfileHeader';
+import ProfilePosts from '@/components/ProfilePosts/ProfilePosts';
 
 interface IProfile {
   params: {
@@ -25,23 +27,26 @@ export const dynamic =
 
 const Profile = async (props: IProfile) => {
   const { slug } = props.params;
-  const profile: IUser = await sanitySdk.getUserBySlug(slug);
-  const session = await getServerSession(authOptions);
-  const currentUser = session?.user as IUser;
+  const queryClient = getQueryClient();
+
+  await queryClient.prefetchQuery(['currentUser'], async () => {
+    const session = await getServerSession(authOptions);
+    return session?.user as IUser;
+  });
+
+  await queryClient.prefetchQuery(['profile', slug], () =>
+    sanitySdk.getUserBySlug(slug)
+  );
+
+  const dehydratedState = dehydrate(queryClient);
 
   return (
-    <div className="pb-12">
-      <ProfileHeader profile={profile} currentUser={currentUser} />
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 max-w-[935px] mx-auto mt-12">
-        {profile.posts.map((post) => (
-          <PostThumbnail
-            key={post._id}
-            currentPost={post}
-            currentUser={currentUser}
-          />
-        ))}
+    <Hydrate state={dehydratedState}>
+      <div className="pb-12">
+        <ProfileHeader slug={slug} />
+        <ProfilePosts slug={slug} />
       </div>
-    </div>
+    </Hydrate>
   );
 };
 

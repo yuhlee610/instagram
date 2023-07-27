@@ -69,9 +69,9 @@ const PostThumbnail = (props: IPostThumbnail) => {
         onClose={() => setIsOpenPostDetail(false)}
         currentUser={currentUser}
         isPostLiked={isLiked}
+        post={props.currentPost}
         showCommentInput
         showComments
-        {...props.currentPost}
       />
     </div>
   );

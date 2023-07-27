@@ -60,7 +60,7 @@ const NewFeed = (props: INewFeed) => {
   const { data: currentUser } = useQuery({
     queryKey: ['currentUser'],
     queryFn: async () => {
-      const response = await fetch('/api/user');
+      const response = await fetch('/api/currentUser');
       const data = await response.json();
       return data.data as IUser;
     },

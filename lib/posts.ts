@@ -1,7 +1,7 @@
 const THOUSAND = 1000;
 const MILLION = 1000000;
 
-export function formatTotalNumber(total: number) {
+export function formatTotalNumber(total: number = 0) {
   if (total < THOUSAND) {
     return total.toLocaleString('de-DE');
   } else if (total < MILLION) {

@@ -4,7 +4,7 @@ import React from 'react';
 import { Image as IImage } from 'sanity';
 
 interface IAvatar {
-  image: IImage;
+  image?: IImage;
   className?: string;
 }
 
