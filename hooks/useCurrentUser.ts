@@ -9,6 +9,7 @@ const useCurrentUser = () => {
       const data = await response.json();
       return data.data as IUser;
     },
+    refetchOnWindowFocus: false,
   });
 
   return data;

@@ -1,11 +1,11 @@
 'use client';
 
-import { IClassName, IPost, IUser } from '@/types/common';
+import { IClassName, IPost } from '@/types/common';
 import React, { useEffect, useRef } from 'react';
 import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 import { PiSpinnerGap } from 'react-icons/pi';
 import NewFeedPost from '../NewFeedPost/NewFeedPost';
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import useCurrentUser from '@/hooks/useCurrentUser';
 
 interface INewFeed extends IClassName {}
@@ -56,6 +56,7 @@ const NewFeed = (props: INewFeed) => {
         ? allPages.length + 1
         : undefined;
     },
+    refetchOnWindowFocus: false,
   });
   const currentUser = useCurrentUser();
 
