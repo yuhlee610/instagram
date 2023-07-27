@@ -17,11 +17,17 @@ import { BsArrowLeft } from 'react-icons/bs';
 import AutoSizingTextarea from '../AutoSizingTextarea/AutoSizingTextarea';
 import { SmallAvatar } from '../Avatar/Avatar';
 import { useSession } from 'next-auth/react';
-import { IUser } from '@/types/common';
+import { IPost, IUser } from '@/types/common';
 import EmojiPicker from '../EmojiPicker/EmojiPicker';
 import { GoCheckCircle } from 'react-icons/go';
 import { IoIosCloseCircleOutline } from 'react-icons/io';
 import { useRouter, useSearchParams } from 'next/navigation';
+import useCurrentUser from '@/hooks/useCurrentUser';
+import {
+  InfiniteData,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query';
 
 const UPLOAD_IMAGES_STAGE = 'UPLOAD_IMAGES_STAGE';
 const PREVIEW_IMAGES_STAGE = 'PREVIEW_IMAGES_STAGE';
@@ -70,9 +76,9 @@ interface IPostInput {
 }
 
 const NewPostModal = () => {
-  const { data: session } = useSession();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const isOpenNewPostModal = !!searchParams?.get('new-post');
   const { register, watch, setValue, reset, getValues, handleSubmit } =
     useForm<IPostInput>();
@@ -81,7 +87,49 @@ const NewPostModal = () => {
   const [stage, setStage] = useState<string>(UPLOAD_IMAGES_STAGE);
   const watchImages = watch('images');
   const previewImages = usePreviewImages(watchImages);
-  const currentUser = session?.user as IUser;
+  const currentUser = useCurrentUser();
+  const { mutateAsync: postMutate } = useMutation({
+    mutationFn: async (data: IPostInput) => {
+      try {
+        const formData = new FormData();
+        const images = [...data.images];
+        images.forEach((image) => formData.append(image.name, image));
+        formData.append('caption', data.caption);
+
+        const response = await fetch('/api/post', {
+          method: 'POST',
+          body: formData,
+        });
+
+        setStage(SUCCESS_SUBMIT_STAGE);
+        return await response.json();
+      } catch (error) {
+        setStage(ERROR_SUBMIT_STAGE);
+      }
+    },
+    onSuccess(newPost) {
+      queryClient.setQueryData<InfiniteData<IPost[]>>(
+        ['newFeedPosts'],
+        (oldData) => {
+          const newData = oldData?.pages.map((page, index) => {
+            if (index === 0) {
+              return [
+                {
+                  ...newPost.data,
+                  author: currentUser,
+                  comments: [],
+                  likes: 0,
+                },
+                ...page,
+              ];
+            }
+            return page;
+          });
+          return { ...oldData, pages: newData } as InfiniteData<IPost[]>;
+        }
+      );
+    },
+  });
 
   const handleClickAddImagesButton = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -134,26 +182,13 @@ const NewPostModal = () => {
   const onSubmit: SubmitHandler<IPostInput> = async (data) => {
     setStage(LOADING_SUBMIT_STAGE);
 
-    try {
-      const formData = new FormData();
-      const images = [...data.images];
-      images.forEach((image) => formData.append(image.name, image));
-      formData.append('caption', data.caption);
-
-      await fetch('/api/post', {
-        method: 'POST',
-        body: formData,
-      });
-      setStage(SUCCESS_SUBMIT_STAGE);
-    } catch (error) {
-      setStage(ERROR_SUBMIT_STAGE);
-    }
+    await postMutate(data);
   };
 
   const onCloseModal = () => {
     setStage(UPLOAD_IMAGES_STAGE);
     router.back();
-  }
+  };
 
   const inputImagesArea = (
     <div
@@ -189,12 +224,7 @@ const NewPostModal = () => {
     <SwiperCarousel className="w-full h-full rounded-b-xl overflow-hidden">
       {previewImages?.map((url, index) => (
         <SwiperSlide key={index}>
-          <Image
-            className="object-cover"
-            src={url}
-            alt="preview image"
-            fill
-          />
+          <Image className="object-cover" src={url} alt="preview image" fill />
         </SwiperSlide>
       ))}
     </SwiperCarousel>
@@ -317,11 +347,7 @@ const NewPostModal = () => {
   const { previousStep, nextStep, content, heading } = getLayoutsMatchStage();
 
   return (
-    <Modal
-      isOpen={isOpenNewPostModal}
-      onClose={onCloseModal}
-      id="create-post"
-    >
+    <Modal isOpen={isOpenNewPostModal} onClose={onCloseModal} id="create-post">
       <div className="h-full flex items-center justify-center">
         <div className="rounded-xl bg-white flex flex-col w-[346px] h-[391px] md:w-[533px] md:h-[578px]">
           <div className="flex justify-between items-center px-3 relative h-11">

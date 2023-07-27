@@ -6,6 +6,7 @@ import { IClassName, IUser } from '@/types/common';
 import Button from '../Button/Button';
 import { formatTotalNumber } from '@/lib/posts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import useCurrentUser from '@/hooks/useCurrentUser';
 
 interface IProfileHeader extends IClassName {
   slug: string;
@@ -17,14 +18,7 @@ const ProfileHeader = (props: IProfileHeader) => {
   const { slug } = props;
   const queryClient = useQueryClient();
 
-  const { data: currentUser } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: async () => {
-      const response = await fetch('/api/currentUser');
-      const data = await response.json();
-      return data.data as IUser;
-    },
-  });
+  const currentUser = useCurrentUser();
 
   const { data: profile } = useQuery({
     queryKey: ['profile', slug],

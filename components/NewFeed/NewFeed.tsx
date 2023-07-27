@@ -6,6 +6,7 @@ import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 import { PiSpinnerGap } from 'react-icons/pi';
 import NewFeedPost from '../NewFeedPost/NewFeedPost';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import useCurrentUser from '@/hooks/useCurrentUser';
 
 interface INewFeed extends IClassName {}
 
@@ -55,16 +56,8 @@ const NewFeed = (props: INewFeed) => {
         ? allPages.length + 1
         : undefined;
     },
-    refetchOnWindowFocus: false,
   });
-  const { data: currentUser } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: async () => {
-      const response = await fetch('/api/currentUser');
-      const data = await response.json();
-      return data.data as IUser;
-    },
-  });
+  const currentUser = useCurrentUser();
 
   useEffect(() => {
     if (isOnView && !!nextPageParamRef.current.lastId) {

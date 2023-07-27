@@ -39,11 +39,12 @@ export async function POST(request: NextRequest) {
     }
     const imageAssets = await sanitySdk.uploadImages(images);
 
-    await sanitySdk.createPost(imageAssets, caption, currentUser._id);
+    const newPost = await sanitySdk.createPost(imageAssets, caption, currentUser._id);
 
     return NextResponse.json(
       {
         message: SUCCESS_CODE_MESSAGE,
+        data: newPost,
       },
       { status: SUCCESS_CODE }
     );

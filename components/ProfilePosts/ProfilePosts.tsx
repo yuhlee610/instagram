@@ -4,6 +4,7 @@ import { IUser } from '@/types/common';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
 import PostThumbnail from '../PostThumbnail/PostThumbnail';
+import useCurrentUser from '@/hooks/useCurrentUser';
 
 interface IProfilePosts {
   slug: string;
@@ -20,14 +21,7 @@ const ProfilePosts = (props: IProfilePosts) => {
     },
   });
 
-  const { data: currentUser } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: async () => {
-      const response = await fetch('/api/currentUser');
-      const data = await response.json();
-      return data.data as IUser;
-    },
-  });
+  const currentUser = useCurrentUser();
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 max-w-[935px] mx-auto mt-12">
