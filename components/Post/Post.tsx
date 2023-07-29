@@ -1,7 +1,7 @@
 'use client';
 
 import React, { MouseEventHandler } from 'react';
-import { IClassName, IComment, IPost, IUser } from '@/types/common';
+import { IClassName, ILike, IPost, IUser } from '@/types/common';
 import { IntermediateAvatar, MediumAvatar } from '../Avatar/Avatar';
 import { formatCreatedAt } from '@/lib/dates';
 import SwiperCarousel from '../SwiperCarousel/SwiperCarousel';
@@ -22,6 +22,7 @@ import {
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query';
+import likePost from '@/services/post/likePost';
 
 interface IPostComponent extends IClassName {
   onOpenModal: MouseEventHandler<SVGElement>;
@@ -44,6 +45,7 @@ const PostComponent = (props: IPostComponent) => {
     post: {
       _id,
       author: {
+        _id: authorId,
         name,
         avatar,
         slug,
@@ -72,15 +74,27 @@ const PostComponent = (props: IPostComponent) => {
   const queryClient = useQueryClient();
   const likeMutation = useMutation({
     mutationFn: handleLike,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+    onSuccess: (likedPost) => {
+      queryClient.setQueryData<IUser>(['currentUser'], (oldCurrentUser) => {
+        return {
+          ...oldCurrentUser,
+          liked: [...(oldCurrentUser?.liked ?? []), likedPost.data],
+        } as IUser;
+      });
       updateTotalLike({ isLiked: true });
     },
   });
   const unlikeMutation = useMutation({
     mutationFn: handleUnlike,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+      queryClient.setQueryData<IUser>(['currentUser'], (oldCurrentUser) => {
+        return {
+          ...oldCurrentUser,
+          liked: (oldCurrentUser?.liked ?? []).filter(
+            (likedPost) => likedPost.post._ref !== _id
+          ),
+        } as IUser;
+      });
       updateTotalLike({ isLiked: false });
     },
   });
@@ -109,6 +123,13 @@ const PostComponent = (props: IPostComponent) => {
       );
     },
   });
+  const inboxMutation = useMutation({
+    mutationFn: () =>
+      fetch('/api/chat', {
+        method: 'POST',
+        body: JSON.stringify({ partnerId: authorId }),
+      }),
+  });
 
   const { register, handleSubmit, watch, reset } = useForm<ICommentForm>();
   const isSubmitButtonActive = !!watch('comment');
@@ -117,10 +138,11 @@ const PostComponent = (props: IPostComponent) => {
     .flatMap((image) => image);
 
   async function handleLike() {
-    await fetch('/api/post/like', {
+    const response = await fetch('/api/post/like', {
       method: 'POST',
       body: JSON.stringify({ postId: _id }),
     });
+    return await response.json();
   }
 
   async function handleUnlike() {

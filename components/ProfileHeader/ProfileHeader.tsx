@@ -32,13 +32,20 @@ const ProfileHeader = (props: IProfileHeader) => {
   const { avatar, name, bio, posts, followers, following, _id } = profile || {};
 
   const { mutate: followMutate, isLoading: followLoading } = useMutation({
-    mutationFn: () =>
-      fetch('/api/user/follow', {
+    mutationFn: async () => {
+      const response = await fetch('/api/user/follow', {
         method: 'POST',
         body: JSON.stringify({ followingId: _id }),
+      });
+      return await response.json();
+    },
+    onSuccess: (newFollow) =>
+      queryClient.setQueryData<IUser>(['profile', slug], (oldProfile) => {
+        return {
+          ...oldProfile,
+          followers: [...(followers ?? []), newFollow.data],
+        } as IUser;
       }),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ['profile', slug] }),
   });
 
   const { mutate: unFollowMutate, isLoading: unFollowLoading } = useMutation({
@@ -47,7 +54,14 @@ const ProfileHeader = (props: IProfileHeader) => {
         method: 'DELETE',
       }),
     onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ['profile', slug] }),
+      queryClient.setQueryData<IUser>(['profile', slug], (oldProfile) => {
+        return {
+          ...oldProfile,
+          followers: (followers ?? []).filter(
+            (follow) => follow.user._ref !== currentUser?._id
+          ),
+        } as IUser;
+      }),
   });
 
   const currentUserIsFollower = !!followers?.find(

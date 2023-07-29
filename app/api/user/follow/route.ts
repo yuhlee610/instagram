@@ -27,11 +27,12 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const currentUser = session.user as IUser;
-    await sanitySdk.follow(currentUser._id, body.followingId);
+    const newFollow = await sanitySdk.follow(currentUser._id, body.followingId);
 
     return NextResponse.json(
       {
         message: SUCCESS_CODE_MESSAGE,
+        data: newFollow,
       },
       { status: SUCCESS_CODE }
     );

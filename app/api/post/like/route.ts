@@ -27,11 +27,12 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const currentUser = session.user as IUser;
-    await sanitySdk.likePost(currentUser._id, body.postId);
+    const likedPost = await sanitySdk.likePost(currentUser._id, body.postId);
 
     return NextResponse.json(
       {
         message: SUCCESS_CODE_MESSAGE,
+        data: likedPost,
       },
       { status: SUCCESS_CODE }
     );
