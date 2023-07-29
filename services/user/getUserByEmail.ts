@@ -20,7 +20,8 @@ export default async function (email: string) {
           participants[] -> {
             _id,
             name,
-            avatar
+            avatar,
+            bio
           },
         }
       }`,

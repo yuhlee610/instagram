@@ -15,9 +15,11 @@ const Inbox = async () => {
   const dehydratedState = dehydrate(queryClient);
 
   return (
-    <Hydrate state={dehydratedState}>
-      <Messenger />
-    </Hydrate>
+    <div className="mb-11">
+      <Hydrate state={dehydratedState}>
+        <Messenger />
+      </Hydrate>
+    </div>
   );
 };
 
