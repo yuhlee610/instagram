@@ -7,6 +7,8 @@ import Button from '../Button/Button';
 import { formatTotalNumber } from '@/lib/posts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import useCurrentUser from '@/hooks/useCurrentUser';
+import { isCreatedChatWith } from '@/lib/user';
+import { useRouter } from 'next/navigation';
 
 interface IProfileHeader extends IClassName {
   slug: string;
@@ -17,7 +19,7 @@ const MOBILE_BREAKPOINT = 768;
 const ProfileHeader = (props: IProfileHeader) => {
   const { slug } = props;
   const queryClient = useQueryClient();
-
+  const router = useRouter();
   const currentUser = useCurrentUser();
 
   const { data: profile } = useQuery({
@@ -64,6 +66,32 @@ const ProfileHeader = (props: IProfileHeader) => {
       }),
   });
 
+  const { mutateAsync: inboxMutate } = useMutation({
+    mutationFn: async () => {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        body: JSON.stringify({ partnerId: profile?._id }),
+      });
+      return await response.json();
+    },
+    onSuccess: (newChat) =>
+      queryClient.setQueryData<IUser>(['currentUser'], (oldCurrentUser) => {
+        return {
+          ...oldCurrentUser,
+          chats: [...(oldCurrentUser?.chats ?? []), newChat.data],
+        } as IUser;
+      }),
+  });
+
+  const onInbox = () => {
+    const inboxPromise = isCreatedChatWith(currentUser, profile)
+      ? Promise.resolve({})
+      : inboxMutate();
+    inboxPromise.then(() => {
+      router.push('/inbox');
+    });
+  };
+
   const currentUserIsFollower = !!followers?.find(
     (follower) => follower.user._ref === currentUser?._id
   );
@@ -96,7 +124,7 @@ const ProfileHeader = (props: IProfileHeader) => {
         >
           {currentUserIsFollower ? 'Đang theo dõi' : 'Theo dõi'}
         </Button>
-        <Button onClick={() => {}}>Nhắn tin</Button>
+        <Button onClick={onInbox}>Nhắn tin</Button>
       </div>
       <div className="hidden md:block md:col-start-2 md:row-start-2">
         <strong>{posts?.length}</strong> bài viết

@@ -9,13 +9,15 @@ import { dehydrate, Hydrate } from '@tanstack/react-query';
 
 const Home = async () => {
   const queryClient = getQueryClient();
-  await queryClient.prefetchInfiniteQuery(['newFeedPosts'], () =>
-    sanitySdk.getLatestPosts({})
-  );
-  await queryClient.prefetchQuery(['currentUser'], async () => {
-    const session = await getServerSession(authOptions);
-    return session?.user as IUser;
-  });
+  await Promise.all([
+    queryClient.prefetchInfiniteQuery(['newFeedPosts'], () =>
+      sanitySdk.getLatestPosts({})
+    ),
+    queryClient.prefetchQuery(['currentUser'], async () => {
+      const session = await getServerSession(authOptions);
+      return session?.user as IUser;
+    }),
+  ]);
   const dehydratedState = dehydrate(queryClient);
 
   return (

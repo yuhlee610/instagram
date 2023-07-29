@@ -22,6 +22,8 @@ import {
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query';
+import { isCreatedChatWith } from '@/lib/user';
+import { useRouter } from 'next/navigation';
 
 interface IPostComponent extends IClassName {
   onOpenModal: MouseEventHandler<SVGElement>;
@@ -70,6 +72,7 @@ const PostComponent = (props: IPostComponent) => {
     currentUser,
     className = '',
   } = props;
+  const router = useRouter();
   const queryClient = useQueryClient();
   const likeMutation = useMutation({
     mutationFn: handleLike,
@@ -122,7 +125,7 @@ const PostComponent = (props: IPostComponent) => {
       );
     },
   });
-  const inboxMutation = useMutation({
+  const { mutateAsync: inboxMutate } = useMutation({
     mutationFn: async () => {
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -134,7 +137,7 @@ const PostComponent = (props: IPostComponent) => {
       queryClient.setQueryData<IUser>(['currentUser'], (oldCurrentUser) => {
         return {
           ...oldCurrentUser,
-          chats: [],
+          chats: [...(oldCurrentUser?.chats ?? []), newChat.data],
         } as IUser;
       }),
   });
@@ -188,6 +191,15 @@ const PostComponent = (props: IPostComponent) => {
     reset({ comment: '' });
   };
 
+  const onInbox = () => {
+    const inboxPromise = isCreatedChatWith(currentUser, props.post.author)
+      ? Promise.resolve({})
+      : inboxMutate();
+    inboxPromise.then(() => {
+      router.push('/inbox');
+    });
+  };
+
   const authorPopupContent = (
     <div className="py-3">
       <div className="flex items-center px-2 gap-2 pb-3">
@@ -227,7 +239,7 @@ const PostComponent = (props: IPostComponent) => {
           </div>
         ))}
       </div>
-      <Button onClick={() => {}} className="ml-auto mt-3 mr-3 block">
+      <Button onClick={onInbox} className="ml-auto mt-3 mr-3 block">
         Nhắn tin
       </Button>
     </div>

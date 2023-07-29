@@ -61,7 +61,7 @@ export interface IUser {
   threeLatestPosts?: {
     images: Image[];
   }[];
-  chat?: IChat[];
+  chats?: IChat[];
 }
 
 export interface IClassName {

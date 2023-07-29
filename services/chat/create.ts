@@ -7,10 +7,12 @@ const createChat = (partnerId: string, currentUserId: string) => {
       {
         _type: 'reference',
         _ref: partnerId,
+        _key: partnerId,
       },
       {
         _type: 'reference',
         _ref: currentUserId,
+        _key: currentUserId,
       },
     ],
     createdAt: new Date(),
