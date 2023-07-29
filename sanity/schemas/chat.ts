@@ -10,7 +10,23 @@ export default defineType({
       title: 'Name',
       type: 'string',
       description: 'A recipient or group name',
-      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'isGroup',
+      title: 'Is a group',
+      type: 'boolean',
+      initialValue: false,
+    }),
+    defineField({
+      name: 'participants',
+      title: 'Participants',
+      type: 'array',
+      of: [
+        {
+          type: 'reference',
+          to: [{ type: 'user' }],
+        },
+      ],
     }),
     defineField({
       name: 'createdAt',
