@@ -1,4 +1,4 @@
-import { client } from "../sanity";
+import { client } from '../sanity';
 
 export default async function (email: string) {
   return await client.fetch(
@@ -13,8 +13,17 @@ export default async function (email: string) {
         modifiedAt,
         'liked': *[_type == "like" && author._ref == ^._id],
         'followers': *[_type == "follow" && following._ref == ^._id],
-        'following': *[_type == "follow" && follower._ref == ^._id]
-    }`,
+        'following': *[_type == "follow" && follower._ref == ^._id],
+        'chats': *[_type == "chat" && ^._id in participants[]._ref] {
+          _id,
+          createdAt,
+          participants[] -> {
+            _id,
+            name,
+            avatar
+          },
+        }
+      }`,
     {
       email,
     }

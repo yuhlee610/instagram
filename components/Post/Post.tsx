@@ -1,7 +1,7 @@
 'use client';
 
 import React, { MouseEventHandler } from 'react';
-import { IClassName, ILike, IPost, IUser } from '@/types/common';
+import { IClassName, IPost, IUser } from '@/types/common';
 import { IntermediateAvatar, MediumAvatar } from '../Avatar/Avatar';
 import { formatCreatedAt } from '@/lib/dates';
 import SwiperCarousel from '../SwiperCarousel/SwiperCarousel';
@@ -22,7 +22,6 @@ import {
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query';
-import likePost from '@/services/post/likePost';
 
 interface IPostComponent extends IClassName {
   onOpenModal: MouseEventHandler<SVGElement>;
@@ -124,10 +123,19 @@ const PostComponent = (props: IPostComponent) => {
     },
   });
   const inboxMutation = useMutation({
-    mutationFn: () =>
-      fetch('/api/chat', {
+    mutationFn: async () => {
+      const response = await fetch('/api/chat', {
         method: 'POST',
         body: JSON.stringify({ partnerId: authorId }),
+      });
+      return await response.json();
+    },
+    onSuccess: (newChat) =>
+      queryClient.setQueryData<IUser>(['currentUser'], (oldCurrentUser) => {
+        return {
+          ...oldCurrentUser,
+          chats: [],
+        } as IUser;
       }),
   });
 

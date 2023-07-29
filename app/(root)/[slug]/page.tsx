@@ -29,14 +29,15 @@ const Profile = async (props: IProfile) => {
   const { slug } = props.params;
   const queryClient = getQueryClient();
 
-  await queryClient.prefetchQuery(['currentUser'], async () => {
-    const session = await getServerSession(authOptions);
-    return session?.user as IUser;
-  });
-
-  await queryClient.prefetchQuery(['profile', slug], () =>
-    sanitySdk.getUserBySlug(slug)
-  );
+  await Promise.all([
+    queryClient.prefetchQuery(['currentUser'], async () => {
+      const session = await getServerSession(authOptions);
+      return session?.user as IUser;
+    }),
+    queryClient.prefetchQuery(['profile', slug], () =>
+      sanitySdk.getUserBySlug(slug)
+    ),
+  ]);
 
   const dehydratedState = dehydrate(queryClient);
 

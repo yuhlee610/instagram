@@ -33,10 +33,5 @@ export default defineType({
       title: 'Create at',
       type: 'datetime',
     }),
-    defineField({
-      name: 'modifiedAt',
-      title: 'Modified at',
-      type: 'datetime',
-    }),
   ],
 });

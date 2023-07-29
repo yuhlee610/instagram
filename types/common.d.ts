@@ -18,6 +18,14 @@ export interface IFollow {
   following: IReference;
 }
 
+export interface IChat {
+  _id: string;
+  name?: string;
+  isGroup: boolean;
+  participants: IUser[];
+  createdAt: Date;
+}
+
 export interface IComment {
   _id: string;
   author: IUser;
@@ -53,6 +61,7 @@ export interface IUser {
   threeLatestPosts?: {
     images: Image[];
   }[];
+  chat?: IChat[];
 }
 
 export interface IClassName {
@@ -68,9 +77,4 @@ export interface IPost {
   modifiedAt: string;
   likes: number;
   comments: IComment[];
-}
-
-export interface IAction {
-  type: string;
-  payload: any;
 }
