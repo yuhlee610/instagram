@@ -11,9 +11,9 @@ const Messenger = () => {
   useEffect(() => {}, []);
 
   return (
-    <div className="flex">
+    <div className="flex h-full">
       <Contacts chats={currentUser?.chats} currentUser={currentUser} />
-      <div className="hidden md:block">
+      <div className="hidden md:block w-full border-l border-gray-200">
         <Chat />
       </div>
     </div>

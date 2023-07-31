@@ -7,13 +7,13 @@ interface IContacts {
   currentUser?: IUser;
 }
 
-const BIO_LIMIT = 80;
+const BIO_LIMIT = 70;
 
 const Contacts = (props: IContacts) => {
   const { chats, currentUser } = props;
 
   return (
-    <div className="flex flex-col gap-3 p-3">
+    <div className="flex flex-col gap-3 p-3 md:max-w-[360px]">
       {chats?.map((chat) => {
         const { participants, _id } = chat;
         const partner = participants.find(
