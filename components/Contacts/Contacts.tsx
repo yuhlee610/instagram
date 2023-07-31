@@ -1,6 +1,7 @@
 import { IChat, IUser } from '@/types/common';
 import React from 'react';
 import { IntermediateAvatar } from '../Avatar/Avatar';
+import Link from 'next/link';
 
 interface IContacts {
   chats?: IChat[];
@@ -23,8 +24,9 @@ const Contacts = (props: IContacts) => {
         const bioText =
           bio?.length <= BIO_LIMIT ? bio : `${bio?.substring(0, BIO_LIMIT)}...`;
         return (
-          <div
+          <Link
             key={_id}
+            href={`/inbox?chatId=${_id}`}
             className="px-2 py-3 flex gap-3 items-center hover:bg-stone-200 cursor-pointer rounded-xl"
           >
             <IntermediateAvatar image={avatar} />
@@ -34,7 +36,7 @@ const Contacts = (props: IContacts) => {
               </div>
               <div className="min-h-[24px] text-sm">{bioText}</div>
             </div>
-          </div>
+          </Link>
         );
       })}
     </div>

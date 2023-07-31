@@ -7,11 +7,11 @@ import {
   UNAUTHORIZED_MESSAGE,
 } from '@/lib/errors';
 import { authOptions } from '@/pages/api/auth/[...nextauth]';
-import { IUser } from '@/types/common';
+import sanitySdk from '@/services';
 import { getServerSession } from 'next-auth';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -24,12 +24,18 @@ export async function GET() {
       );
     }
 
-    const currentUser = session.user as IUser;
+    const chatId = request.nextUrl.searchParams.get('chatId');
+
+    if (!chatId) {
+      throw Error();
+    }
+
+    const messages = await sanitySdk.getMessagesByChat(chatId);
 
     return NextResponse.json(
       {
         message: SUCCESS_CODE_MESSAGE,
-        data: currentUser,
+        data: messages,
       },
       { status: SUCCESS_CODE }
     );
