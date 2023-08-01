@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { messageText, chatId } = await request.json();
+    const { message: messageText, chatId } = await request.json();
     const currentUser = session.user as IUser;
     const newMessage = await sanitySdk.createMessage(
       chatId,
