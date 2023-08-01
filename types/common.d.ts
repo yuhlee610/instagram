@@ -23,7 +23,7 @@ export interface IChat {
   name?: string;
   isGroup: boolean;
   participants: IUser[];
-  createdAt: Date;
+  createdAt: string;
 }
 
 export interface IComment {
@@ -77,4 +77,12 @@ export interface IPost {
   modifiedAt: string;
   likes: number;
   comments: IComment[];
+}
+
+export interface IMessage {
+  _id: string;
+  sender: IUser;
+  messageText: string;
+  createdAt: string;
+  chat?: IChat;
 }

@@ -14,7 +14,7 @@ const Messenger = () => {
     <div className="flex h-full">
       <Contacts chats={currentUser?.chats} currentUser={currentUser} />
       <div className="hidden md:block w-full border-l border-gray-200">
-        <Chat />
+        <Chat currentUser={currentUser} />
       </div>
     </div>
   );

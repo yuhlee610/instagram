@@ -12,6 +12,7 @@ import follow from './user/follow';
 import unFollow from './user/unFollow';
 import createChat from './chat/create';
 import getMessagesByChat from './message/getMessagesByChat';
+import createMessage from './message/create';
 
 const sanitySdk = {
   getUserByEmail,
@@ -28,6 +29,7 @@ const sanitySdk = {
   unFollow,
   createChat,
   getMessagesByChat,
+  createMessage,
 };
 
 export default sanitySdk;
