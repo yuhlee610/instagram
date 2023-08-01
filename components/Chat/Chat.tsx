@@ -23,11 +23,7 @@ const query = `*[_type == "message" && chat._ref == $chatId] | order(createdAt) 
       _id,
       messageText,
       createdAt,
-      sender -> {
-        _id,
-        name,
-        avatar
-      }
+      sender
     }`;
 
 const Chat: FC<IChatComponent> = (props) => {
@@ -44,8 +40,9 @@ const Chat: FC<IChatComponent> = (props) => {
       const response = await fetch(`/api/message?chatId=${chatId}`);
       const data = await response.json();
       return data.data;
-    },{
-      refetchOnWindowFocus: false
+    },
+    {
+      refetchOnWindowFocus: false,
     }
   );
 
@@ -62,7 +59,6 @@ const Chat: FC<IChatComponent> = (props) => {
       .listen(query, { chatId })
       .subscribe((update) => {
         const newMessage = update.result;
-        console.log(newMessage)
         queryClient.setQueryData<IMessage[]>(
           ['message', chatId],
           (oldMessage) => {

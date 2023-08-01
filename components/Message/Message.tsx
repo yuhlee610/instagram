@@ -24,8 +24,6 @@ const Message: FC<IMessageComponent> = (props) => {
 
   const isMyMessage = currentUser?._id === sender._ref;
   const senderInfo = participants?.find(user => user._id === sender._ref);
-  console.log(participants)
-  console.log(senderInfo)
 
   return (
     <div className={`w-fit max-w-[80%] mb-3 ${isMyMessage && 'ml-auto'}`}>
