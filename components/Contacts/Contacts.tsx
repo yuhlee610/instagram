@@ -1,7 +1,10 @@
+'use client';
+
 import { IChat, IUser } from '@/types/common';
 import React from 'react';
 import { IntermediateAvatar } from '../Avatar/Avatar';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 interface IContacts {
   chats?: IChat[];
@@ -12,6 +15,8 @@ const BIO_LIMIT = 70;
 
 const Contacts = (props: IContacts) => {
   const { chats, currentUser } = props;
+  const searchParams = useSearchParams();
+  const chatId = searchParams?.get('chatId');
 
   return (
     <div className="flex flex-col gap-3 p-3 md:max-w-[360px]">
@@ -27,7 +32,9 @@ const Contacts = (props: IContacts) => {
           <Link
             key={_id}
             href={`/inbox?chatId=${_id}`}
-            className="px-2 py-3 flex gap-3 items-center hover:bg-stone-200 cursor-pointer rounded-xl"
+            className={`px-2 py-3 flex gap-3 items-center hover:bg-stone-200 cursor-pointer rounded-xl ${
+              chatId === _id && 'bg-stone-200'
+            }`}
           >
             <IntermediateAvatar image={avatar} />
             <div>
