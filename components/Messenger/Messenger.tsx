@@ -1,14 +1,12 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import Contacts from '../Contacts/Contacts';
 import Chat from '../Chat/Chat';
 import useCurrentUser from '@/hooks/useCurrentUser';
 
 const Messenger = () => {
   const currentUser = useCurrentUser();
-
-  useEffect(() => {}, []);
 
   return (
     <div className="flex h-full">

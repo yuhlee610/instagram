@@ -1,13 +1,14 @@
 'use client';
 
 import { IMessage, IUser } from '@/types/common';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'next/navigation';
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import Message from '../Message/Message';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import AutoSizingTextarea from '../AutoSizingTextarea/AutoSizingTextarea';
 import { RiSendPlaneFill } from 'react-icons/ri';
+import { client } from '@/services/sanity';
 
 interface IChatComponent {
   currentUser?: IUser;
@@ -18,9 +19,21 @@ interface IMessageForm {
   chatId: string;
 }
 
+const query = `*[_type == "message" && chat._ref == $chatId] | order(createdAt) {
+      _id,
+      messageText,
+      createdAt,
+      sender -> {
+        _id,
+        name,
+        avatar
+      }
+    }`;
+
 const Chat: FC<IChatComponent> = (props) => {
   const { currentUser } = props;
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
   const chatId = searchParams?.get('chatId');
 
   const { register, handleSubmit, reset } = useForm<IMessageForm>();
@@ -31,6 +44,8 @@ const Chat: FC<IChatComponent> = (props) => {
       const response = await fetch(`/api/message?chatId=${chatId}`);
       const data = await response.json();
       return data.data;
+    },{
+      refetchOnWindowFocus: false
     }
   );
 
@@ -42,12 +57,29 @@ const Chat: FC<IChatComponent> = (props) => {
       }),
   });
 
+  useEffect(() => {
+    const subscription = client
+      .listen(query, { chatId })
+      .subscribe((update) => {
+        const newMessage = update.result;
+        console.log(newMessage)
+        queryClient.setQueryData<IMessage[]>(
+          ['message', chatId],
+          (oldMessage) => {
+            return [...(oldMessage ?? []), newMessage] as IMessage[];
+          }
+        );
+      });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   const onSendMessage: SubmitHandler<IMessageForm> = async (data) => {
     await messageMutateAsync(data);
     reset({ message: '' });
   };
 
-  if (!chatId || messages?.length === 0) {
+  if (!chatId) {
     return (
       <div className="flex items-center justify-center h-full">
         <div>Hãy chọn một đoạn chat hoặc bắt đầu cuộc trò chuyện mới</div>

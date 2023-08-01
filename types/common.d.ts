@@ -81,7 +81,7 @@ export interface IPost {
 
 export interface IMessage {
   _id: string;
-  sender: IUser;
+  sender: IReference;
   messageText: string;
   createdAt: string;
   chat?: IChat;

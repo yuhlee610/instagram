@@ -12,20 +12,25 @@ interface IMessageComponent {
 const Message: FC<IMessageComponent> = (props) => {
   const {
     message: {
-      sender: { _id: senderId, name, avatar },
+      sender,
       messageText,
       createdAt,
+      chat,
     },
     currentUser,
     latestMessage,
   } = props;
+  const { participants } = chat || {};
 
-  const isMyMessage = currentUser?._id === senderId;
+  const isMyMessage = currentUser?._id === sender._ref;
+  const senderInfo = participants?.find(user => user._id === sender._ref);
+  console.log(participants)
+  console.log(senderInfo)
 
   return (
     <div className={`w-fit max-w-[80%] mb-3 ${isMyMessage && 'ml-auto'}`}>
       <div className="flex gap-2">
-        {!isMyMessage && <MediumAvatar image={avatar} />}
+        {!isMyMessage && <MediumAvatar image={senderInfo?.avatar} />}
         <div className="bg-lime-400 px-3 py-2 rounded-xl text-sm">
           {messageText}
         </div>

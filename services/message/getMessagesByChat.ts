@@ -6,10 +6,13 @@ const getMessagesByChat = (chatId: string) => {
       _id,
       messageText,
       createdAt,
-      sender -> {
-        _id,
-        name,
-        avatar
+      sender,
+      chat -> {
+        participants[] -> {
+          _id,
+          avatar,
+          name
+        }
       }
     }`,
     {
