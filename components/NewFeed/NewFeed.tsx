@@ -5,63 +5,56 @@ import React, { useEffect, useRef } from 'react';
 import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 import { PiSpinnerGap } from 'react-icons/pi';
 import NewFeedPost from '../NewFeedPost/NewFeedPost';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import {
+  InfiniteData,
+  useInfiniteQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 import useCurrentUser from '@/hooks/useCurrentUser';
 
 interface INewFeed extends IClassName {}
-
-interface INextPageParam {
-  lastId: string;
-  lastCreatedAt: string;
-  hasNextPage: boolean;
-}
 
 const PER_PAGE = 3;
 
 const NewFeed = (props: INewFeed) => {
   const observerTarget = useRef<HTMLDivElement>(null);
   const isOnView = useInfiniteScroll(observerTarget);
-  const nextPageParamRef = useRef<INextPageParam>({
-    lastId: '',
-    lastCreatedAt: '',
-    hasNextPage: true,
-  });
+  const queryClient = useQueryClient();
+  const usePrefetchDataRef = useRef<boolean>(true);
   const { data, fetchNextPage, isFetchingNextPage } = useInfiniteQuery({
     queryKey: ['newFeedPosts'],
     queryFn: async () => {
-      const { lastId, lastCreatedAt, hasNextPage } = nextPageParamRef.current;
+      const prevPosts = queryClient.getQueryData([
+        'newFeedPosts',
+      ]) as InfiniteData<IPost[]>;
 
-      if (!hasNextPage) {
-        return Promise.resolve([]);
+      const prevLastChunkIndex = prevPosts.pages.findLastIndex((c) => c);
+      const prevLastChunk = prevPosts.pages[prevLastChunkIndex];
+
+      if (usePrefetchDataRef.current || prevLastChunk.length === 0) {
+        usePrefetchDataRef.current = false;
+        return prevLastChunk;
       }
+
+      const prevLastPost = prevLastChunk?.findLast((p) => p);
+      const { _id: lastId = '', createdAt: lastCreatedAt = '' } =
+        prevLastPost ?? {};
 
       const response = await fetch(
         `/api/post?lastId=${lastId}&lastCreatedAt=${lastCreatedAt}&perPage=${PER_PAGE}`
       );
 
       const data = await response.json();
-      const posts = data.data as IPost[];
-      const lastPost = posts.findLast((post: IPost) => post);
-
-      nextPageParamRef.current = {
-        lastId: lastPost?._id || '',
-        lastCreatedAt: lastPost?.createdAt || '',
-        hasNextPage: !!lastPost,
-      };
-
-      return posts;
+      return data.data;
     },
-    getNextPageParam: (_, allPages) => {
-      return nextPageParamRef.current.hasNextPage
-        ? allPages.length + 1
-        : undefined;
-    },
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.length ? allPages.length + 1 : undefined,
     refetchOnWindowFocus: false,
   });
   const currentUser = useCurrentUser();
 
   useEffect(() => {
-    if (isOnView && !!nextPageParamRef.current.lastId) {
+    if (isOnView) {
       fetchNextPage();
     }
   }, [isOnView]);
