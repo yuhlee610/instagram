@@ -21,8 +21,8 @@ export default async function (email: string) {
             _id,
             name,
             avatar,
-            bio
           },
+          'latestMessage': *[_type == "message" && chat._ref == ^._id] | order(createdAt desc)[0]
         }
       }`,
     {

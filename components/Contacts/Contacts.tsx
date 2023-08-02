@@ -1,33 +1,52 @@
 'use client';
 
 import { IChat, IUser } from '@/types/common';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { IntermediateAvatar } from '../Avatar/Avatar';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { client } from '@/services/sanity';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface IContacts {
   chats?: IChat[];
   currentUser?: IUser;
 }
 
-const BIO_LIMIT = 70;
+const LATEST_MESSAGE_LIMIT = 70;
+const query = `*[_type == "chat" && $userId in participants[]._ref]`;
 
 const Contacts = (props: IContacts) => {
   const { chats, currentUser } = props;
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
   const chatId = searchParams?.get('chatId');
 
+  useEffect(() => {
+    const subscription = client
+      .listen(query, {
+        userId: currentUser?._id,
+      })
+      .subscribe(() => {
+        queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+      });
+
+    return () => subscription.unsubscribe();
+  }, [currentUser]);
+
   return (
-    <div className="flex flex-col gap-3 p-3 md:max-w-[360px]">
+    <div className="flex flex-col gap-3 p-3 w-full md:max-w-[360px]">
       {chats?.map((chat) => {
-        const { participants, _id } = chat;
+        const { participants, _id, latestMessage } = chat;
         const partner = participants.find(
           (participant) => participant._id !== currentUser?._id
         );
-        const { avatar, name, bio = '' } = partner || {};
-        const bioText =
-          bio?.length <= BIO_LIMIT ? bio : `${bio?.substring(0, BIO_LIMIT)}...`;
+        const { avatar, name } = partner || {};
+        const latestMessageText = latestMessage?.messageText || `${name} muốn nhắn tin với bạn`;
+        const displayLatestMessage =
+          latestMessageText?.length <= LATEST_MESSAGE_LIMIT
+            ? latestMessageText
+            : `${latestMessageText?.substring(0, LATEST_MESSAGE_LIMIT)}...`;
         return (
           <Link
             key={_id}
@@ -41,7 +60,7 @@ const Contacts = (props: IContacts) => {
               <div className="text-sm">
                 <strong>{name}</strong>
               </div>
-              <div className="min-h-[24px] text-sm">{bioText}</div>
+              <div className="min-h-[24px] text-sm">{displayLatestMessage}</div>
             </div>
           </Link>
         );

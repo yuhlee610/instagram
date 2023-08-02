@@ -24,6 +24,7 @@ export interface IChat {
   isGroup: boolean;
   participants: IUser[];
   createdAt: string;
+  latestMessage?: IMessage;
 }
 
 export interface IComment {

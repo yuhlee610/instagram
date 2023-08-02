@@ -1,7 +1,7 @@
 import { IUser } from '@/types/common';
 import { useQuery } from '@tanstack/react-query';
 
-const useCurrentUser = () => {
+const useCurrentUser = (options?: object) => {
   const { data } = useQuery({
     queryKey: ['currentUser'],
     queryFn: async () => {
@@ -10,6 +10,7 @@ const useCurrentUser = () => {
       return data.data as IUser;
     },
     refetchOnWindowFocus: false,
+    ...options,
   });
 
   return data;

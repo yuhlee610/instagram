@@ -65,10 +65,26 @@ const Chat: FC<IChatComponent> = (props) => {
             return [...(oldMessage ?? []), newMessage] as IMessage[];
           }
         );
+
+        queryClient.setQueryData<IUser>(['currentUser'], (oldCurrentUser) => {
+          const newChats = oldCurrentUser?.chats?.map((chat) => {
+            if (chat._id === chatId) {
+              return {
+                ...chat,
+                latestMessage: newMessage,
+              };
+            }
+            return chat;
+          });
+          return {
+            ...oldCurrentUser,
+            chats: newChats,
+          } as IUser;
+        });
       });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [chatId]);
 
   const onSendMessage: SubmitHandler<IMessageForm> = async (data) => {
     await messageMutateAsync(data);

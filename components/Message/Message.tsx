@@ -26,10 +26,14 @@ const Message: FC<IMessageComponent> = (props) => {
   const senderInfo = participants?.find(user => user._id === sender._ref);
 
   return (
-    <div className={`w-fit max-w-[80%] mb-3 ${isMyMessage && 'ml-auto'}`}>
+    <div
+      className={`flex flex-col w-fit max-w-[80%] mb-3 ${
+        isMyMessage && 'ml-auto'
+      }`}
+    >
       <div className="flex gap-2">
         {!isMyMessage && <MediumAvatar image={senderInfo?.avatar} />}
-        <div className="bg-lime-400 px-3 py-2 rounded-xl text-sm">
+        <div className="bg-lime-400 px-3 py-2 rounded-xl text-sm whitespace-pre">
           {messageText}
         </div>
       </div>

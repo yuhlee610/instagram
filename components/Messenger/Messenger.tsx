@@ -6,7 +6,7 @@ import Chat from '../Chat/Chat';
 import useCurrentUser from '@/hooks/useCurrentUser';
 
 const Messenger = () => {
-  const currentUser = useCurrentUser();
+  const currentUser = useCurrentUser({ refetchInterval: 30 * 1000 });
 
   return (
     <div className="flex h-full">
