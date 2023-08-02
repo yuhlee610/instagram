@@ -1,9 +1,9 @@
-import React from 'react'
+import React from 'react';
 
 const Loading = () => {
   return (
-    <div>Đang tải...</div>
-  )
-}
+    <div className="h-full flex items-center justify-center">Đang tải...</div>
+  );
+};
 
-export default Loading
+export default Loading;

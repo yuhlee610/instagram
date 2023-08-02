@@ -53,7 +53,7 @@ export interface IUser {
   emailVerified: string;
   createdAt: string;
   modifiedAt: string;
-  bio: string;
+  bio?: string;
   liked: ILike[];
   posts: IPost[];
   postsTotal: number;

@@ -71,12 +71,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const perPage = request.nextUrl.searchParams.get('perPage');
-    const lastId = request.nextUrl.searchParams.get('lastId')!;
-    const lastCreatedAt = request.nextUrl.searchParams.get('lastCreatedAt')!;
+    const perPage = request.nextUrl.searchParams.get('perPage') ?? DEFAULT_PER_PAGE;
+    const lastId = request.nextUrl.searchParams.get('lastId') ?? '';
+    const lastCreatedAt = request.nextUrl.searchParams.get('lastCreatedAt') ?? '';
 
     const posts = await sanitySdk.getLatestPosts({
-      perPage: +(perPage ?? DEFAULT_PER_PAGE),
+      perPage: +perPage,
       lastId,
       lastCreatedAt,
     });

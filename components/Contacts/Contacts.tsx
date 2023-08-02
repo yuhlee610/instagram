@@ -41,8 +41,8 @@ const Contacts = (props: IContacts) => {
         const partner = participants.find(
           (participant) => participant._id !== currentUser?._id
         );
-        const { avatar, name } = partner || {};
-        const latestMessageText = latestMessage?.messageText || `${name} muốn nhắn tin với bạn`;
+        const { avatar, name } = partner ?? {};
+        const latestMessageText = latestMessage?.messageText ?? `${name} muốn nhắn tin với bạn`;
         const displayLatestMessage =
           latestMessageText?.length <= LATEST_MESSAGE_LIMIT
             ? latestMessageText

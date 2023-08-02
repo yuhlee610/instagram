@@ -20,7 +20,7 @@ const NewFeed = (props: INewFeed) => {
   const observerTarget = useRef<HTMLDivElement>(null);
   const isOnView = useInfiniteScroll(observerTarget);
   const queryClient = useQueryClient();
-  const usePrefetchDataRef = useRef<boolean>(true);
+  const useDehydratedCacheRef = useRef<boolean>(true);
   const { data, fetchNextPage, isFetchingNextPage } = useInfiniteQuery({
     queryKey: ['newFeedPosts'],
     queryFn: async () => {
@@ -31,8 +31,8 @@ const NewFeed = (props: INewFeed) => {
       const prevLastChunkIndex = prevPosts.pages.findLastIndex((c) => c);
       const prevLastChunk = prevPosts.pages[prevLastChunkIndex];
 
-      if (usePrefetchDataRef.current || prevLastChunk.length === 0) {
-        usePrefetchDataRef.current = false;
+      if (useDehydratedCacheRef.current || prevLastChunk.length === 0) {
+        useDehydratedCacheRef.current = false;
         return prevLastChunk;
       }
 
